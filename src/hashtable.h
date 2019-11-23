@@ -16,7 +16,6 @@ struct docNode {
 struct wordNode {
         char* word;
         int df;
-        int idf;
         struct docNode* head;
         struct wordNode* next;
 };
@@ -60,12 +59,11 @@ void ht_remove (struct hashtable* ht, char* word, char* doc_id);
  */
 void ht_destroy (struct hashtable* ht);
 /**
- * Hashing function to determine which bucket this word and doc_id belongs in.
+ * Hashing function to determine which bucket this word belongs in.
  * @param ht      pointer to the hashmap
  * @param word    char* to word we need to add
- * @param doc_id  char* to doc_id word belongs to
  * @return the hash code of this word and doc_id pair
  */
-int hash_code (struct hashtable* ht, char* word, char* doc_id);
+int hash_code (struct hashtable* ht, char* word);
 
 #endif

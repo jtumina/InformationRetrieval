@@ -10,88 +10,66 @@
 #include "hashmap.h"
 
 /**
- * Allocates a new HashMap with the specified number of buckets.
- * @param num_buckets      number of buckets to create
- * @return struct hasmap*  pointer to a hashmap
+ * Creates a new hashtable.
+ * @param  num_buckets Number of buckets this hashtable should have
+ * @return pointer to this hashtable
  */
-struct hashmap* hm_create(int num_buckets) {
-    // Initialize space for hm
-	struct hashmap* hm = (struct hashmap*) malloc (sizeof (struct hashmap));
+struct hashtable* ht_create (int num_buckets) {
+    // Initialize space for ht
+	struct hashtable* ht = (struct hashtable*) malloc (sizeof (struct hashtable));
 
-    hm->map = (struct llnode**) malloc (num_buckets * sizeof (struct llnode*));
-	hm->num_buckets = num_buckets;
-	hm->num_elements = 0;
+    ht->map = (struct wordNode**) malloc (num_buckets * sizeof (struct wordNode*));
+	ht->num_buckets = num_buckets;
+	ht->num_elements = 0;
+    ht->docs;
+    ht->num_docs;
 
-    // Initialize space for a list pointer in each bucket
+    // Initialize space for a wordNode pointer in each bucket
 	for (int i = 0; i < num_buckets; i++) {
-		hm->map[i] = (struct llnode*) malloc (sizeof (struct llnode));
+		ht->map[i] = (struct wordNode*) malloc (sizeof (struct wordNode));
 
 		// Initialize variables in llnode to NULL/0
-		hm->map[i]->word = NULL;
-		hm->map[i]->document_id = NULL;
-		hm->map[i]->num_occurrences = 0;
-		hm->map[i]->next = NULL;
+		ht->map[i]->word = NULL;
+		ht->map[i]->df = 0;
+        ht->map[i]->idf = 0;
+        ht->map[i]->head = NULL;
+		ht->map[i]->next = NULL;
 	}
 
-    return hm;
+    return ht;
 }
 
 /**
- * Return the value associated with the key that is passed in within the HashMap
- * that is passed in. If the element is not found, return -1.
- * @param hm           pointer to hashmap
- * @param word         word to search for
- * @param document_id  id to which document
- * @return the num_occurrences of the word and document_id
+ * (1) Inserts this word and doc_id pair into hashtable along with the
+ *     corresponding docNode for which this word occurs in.
+ * (2) If the word and doc_id pair already exists, update its tf.
+ * (3) If the word exists but in a different document,
+ *     add new doc_id and update its df.
+ * @param ht      pointer to the hashmap
+ * @param word    char* to word we need to add
+ * @param doc_id  char* to doc_id word belongs to
  */
-int hm_get(struct hashmap* hm, char* word, char* document_id) {
-    // Get the bucket this word would be in
-	int hashCode = hash (hm, word, document_id);
-
-    // Set pointer to point to correct bucket
-	struct llnode* nodePtr = hm->map[hashCode];
-
-    // If the word is NULL in this bucket, the word does not exist in the list
-    if (nodePtr->word == NULL) {
-        return -1;
-    }
-
-    // While the word is not NULL and either does not equal the word we are trying to
-    // insert or does not equal the document_id, move to next node in list
-	while (nodePtr != NULL
-			&& (strcmp (nodePtr->word, word) != 0 || strcmp (nodePtr->document_id, document_id) != 0)) {
-		nodePtr = nodePtr->next;
-	}
-
-    // If we reached NULL, word does not exist
-    if (nodePtr == NULL) {
-        return -1;
-    }
-
-    // Else, we have found the word, return the num_occurrences of it
-    return nodePtr->num_occurrences;
-}
-
-/**
- * Put the key value pair into hashmap.
- * If word and document_id already exist, update its num_occurrences
- * @param hm				pointer to hashmap
- * @param word				word to be stored
- * @param document_id		to which document
- * @param num_occurrences   of this word and document_id
- */
-void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences){
+void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
     // Get this bucket this word belongs in
-	int hashCode = hash (hm, word, document_id);
+	int hashCode = hash_code (ht, word);
 
     // Set pointer to point to correct bucket
-	struct llnode* nodePtr = hm->map[hashCode];
+	struct wordNode* nodePtr = ht->map[hashCode];
 
-    // If this bucket is empty, set a node to this word and return
+    // If the first word in the bucket is NULL, then fill this wordNode with the
+    // correct info and create a docNode
 	if (nodePtr->word == NULL) {
-		nodePtr->word = word;
-		nodePtr->document_id = document_id;
-		nodePtr->num_occurrences = num_occurrences;
+        nodePtr->word = word;
+        nodePtr->df = 1;
+        nodePtr->head = (struct docNode*) malloc (sizeof (struct docNode));
+        nodePtr->next = NULL;
+
+        // Initialize the docNode associated with this wordNode
+        nodePtr->head = (struct docNode*) malloc (sizeof (struct docNode));
+        nodePtr->head->doc_id = doc_id;
+        nodePtr->head->tf = 1;
+        nodePtr->head->next = NULL;
+
         return;
 	}
 
@@ -123,7 +101,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
 	lastPtr->next = nodePtr;
 
 	// Increment num_elements
-	hm->num_elements--;
+	hm->num_elements++;
 }
 
 /**
