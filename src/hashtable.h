@@ -16,7 +16,7 @@ struct docNode {
 struct wordNode {
         char* word;
         int df;
-        struct docNode* head;
+        struct docNode* docHead;
         struct wordNode* next;
 };
 
@@ -34,6 +34,12 @@ struct hashtable {
  * @return pointer to this hashtable
  */
 struct hashtable* ht_create (int num_buckets);
+/**
+ * Initialize a new word node with the given parameters.
+ * @param word    char* to word we need to add
+ * @param doc_id  char* to doc_id word belongs to
+ */
+struct wordNode* init_wordNode (char* word, char* doc_id);
 /**
  * (1) Inserts this word and doc_id pair into hashtable along with the
  *     corresponding docNode for which this word occurs in.

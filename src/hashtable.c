@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hashmap.h"
+#include <hashtable.h>
 
 /**
  * Creates a new hashtable.
@@ -28,15 +28,33 @@ struct hashtable* ht_create (int num_buckets) {
 	for (int i = 0; i < num_buckets; i++) {
 		ht->map[i] = (struct wordNode*) malloc (sizeof (struct wordNode));
 
-		// Initialize variables in llnode to NULL/0
+		// Initialize variables in wordNode to NULL/0
 		ht->map[i]->word = NULL;
 		ht->map[i]->df = 0;
         ht->map[i]->idf = 0;
-        ht->map[i]->head = NULL;
+        ht->map[i]->docHead = NULL;
 		ht->map[i]->next = NULL;
 	}
 
     return ht;
+}
+
+/**
+ * Initialize a new word node with the given parameters.
+ * @param word    char* to word we need to add
+ * @param doc_id  char* to doc_id word belongs to
+ */
+void init_wordNode (struct wordNode* wn, char* word, char* doc_id) {
+    // Initialize fields of wordNode
+    wn->word = word;
+    wn->df = 1;
+    wn->docHead = (struct docNode*) malloc (sizeof (struct docNode));
+    wn->next = NULL;
+
+    // Initialize fields of docNode associated with this wordNode
+    wn->docHead->doc_id = doc_id;
+    wn->docHead->tf = 1;
+    wn->docHead->next = NULL;
 }
 
 /**
@@ -56,52 +74,38 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
     // Set pointer to point to correct bucket
 	struct wordNode* nodePtr = ht->map[hashCode];
 
-    // If the first word in the bucket is NULL, then fill this wordNode with the
-    // correct info and create a docNode
+    // If the first word in the bucket is NULL, then call init_wordNode() to fill it
 	if (nodePtr->word == NULL) {
-        nodePtr->word = word;
-        nodePtr->df = 1;
-        nodePtr->head = (struct docNode*) malloc (sizeof (struct docNode));
-        nodePtr->next = NULL;
-
-        // Initialize the docNode associated with this wordNode
-        nodePtr->head = (struct docNode*) malloc (sizeof (struct docNode));
-        nodePtr->head->doc_id = doc_id;
-        nodePtr->head->tf = 1;
-        nodePtr->head->next = NULL;
-
+        init_wordNode (nodePtr, word, doc_id);
+        // Increment num_elements
+    	ht->num_elements++;
         return;
 	}
 
 	// Temporary pointer to track node before the one we are looking at,
 	// this way we can set the nodePtr->next to the correct node
-	struct llnode* lastPtr = NULL;
+	struct wordNode* lastPtr = NULL;
 
-    // While the word is not NULL and either does not equal the word we are trying to
-    // insert or does not equal the document_id, move to next node in list
+    // While the word is not NULL continue on through list
 	while (nodePtr != NULL) {
-		// If we've found the word already in hashmap, update its num_occurrences
-		if (strcmp (nodePtr->word, word) == 0 && strcmp (nodePtr->document_id, document_id) == 0) {
-			nodePtr->num_occurrences = num_occurrences;
-			return;
+		// If we've found the word already in hashmap, we only need to update its fields
+		if (strcmp (nodePtr->word, word) == 0) {
+            // TODO: Check the docNodes
 		}
 		// Else, continue on to next node
 		lastPtr = nodePtr;
 		nodePtr = nodePtr->next;
 	}
 
-    // Word is not in hashmap, allocate space for a new node
-    nodePtr = (struct llnode*) malloc (sizeof (struct llnode));
-    nodePtr->word = word;
-    nodePtr->document_id = document_id;
-    nodePtr->num_occurrences = num_occurrences;
-    nodePtr->next = NULL;
+    // If nodePtr==NULL, word is not in hashmap, call init_wordNode
+    nodePtr = (struct wordNode*) malloc (sizeof (struct wordNode));
+    init_wordNode (nodePtr, word, doc_id);
 
 	// Set node before the one's next to this node
 	lastPtr->next = nodePtr;
 
 	// Increment num_elements
-	hm->num_elements++;
+	ht->num_elements++;
 }
 
 /**
@@ -172,12 +176,12 @@ void hm_destroy(struct hashmap* hm){
 }
 
 /**
- * Take the given word and document_id and map them to a bucket in the HashMap.
- * @param hm pointer to hashmap
- * @param word         key
- * @param document_id  id to which document
+ * Hashing function to determine which bucket this word belongs in.
+ * @param ht      pointer to the hashmap
+ * @param word    char* to word we need to add
+ * @return the hash code of this word and doc_id pair
  */
-int hash(struct hashmap* hm, char* word, char* document_id){
+int hash_code (struct hashtable* ht, char* word) {
 	// Track sum of ASCII values of word
 	int sum = 0;
 	int i = 0;
@@ -188,13 +192,6 @@ int hash(struct hashmap* hm, char* word, char* document_id){
 		i++;
 	}
 
-	i = 0;
-	// Now loop through document_id and do the same
-	while (*(document_id+i) != '\0') {
-		sum += (int) *(document_id+i);
-		i++;
-	}
-
 	// Return the sum % num_buckets to keep range consitent
-	return sum % hm->num_buckets;
+	return sum % ht->num_buckets;
 }
