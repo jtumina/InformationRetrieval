@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <hashtable.h>
+#include "hashtable.h"
 
 /**
  * Creates a new hashtable.
@@ -31,7 +31,6 @@ struct hashtable* ht_create (int num_buckets) {
 		// Initialize variables in wordNode to NULL/0
 		ht->map[i]->word = NULL;
 		ht->map[i]->df = 0;
-        ht->map[i]->idf = 0;
         ht->map[i]->docHead = NULL;
 		ht->map[i]->next = NULL;
 	}
