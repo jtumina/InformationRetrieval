@@ -21,8 +21,8 @@ struct hashtable* ht_create (int num_buckets) {
     ht->map = (struct wordNode**) malloc (num_buckets * sizeof (struct wordNode*));
 	ht->num_buckets = num_buckets;
 	ht->num_elements = 0;
-    ht->docs;
-    ht->num_docs;
+    ht->fileNames = NULL;
+    ht->num_files = 0;
 
     // Initialize space for a wordNode pointer in each bucket
 	for (int i = 0; i < num_buckets; i++) {
@@ -44,9 +44,9 @@ struct hashtable* ht_create (int num_buckets) {
  * @param doc_id  char* to doc_id word belongs to
  */
 void init_docNode (struct docNode* docPtr, char* doc_id) {
-    wordPtr->docHead->doc_id = doc_id;
-    wordPtr->docHead->tf = 1;
-    wordPtr->docHead->next = NULL;
+    docPtr->doc_id = doc_id;
+    docPtr->tf = 1;
+    docPtr->next = NULL;
 }
 
 /**
@@ -72,7 +72,7 @@ void init_wordNode (struct wordNode* wordPtr, char* word, char* doc_id) {
  * (2) If the word and doc_id pair already exists, update its tf.
  * (3) If the word exists but in a different document,
  *     add new doc_id and update its df.
- * @param ht      pointer to the hashmap
+ * @param ht      pointer to the hashtable
  * @param word    char* to word we need to add
  * @param doc_id  char* to doc_id word belongs to
  */
@@ -97,7 +97,7 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
 
     // While the word is not NULL continue on through list
 	while (wordPtr != NULL) {
-		// If we've found the word already in hashmap, we only need to update its fields
+		// If we've found the word already in hashtable, we only need to update its fields
 		if (strcmp (wordPtr->word, word) == 0) {
             // Continue through docNodes until we find the right doc
             struct docNode* docPtr = wordPtr->docHead;
@@ -125,7 +125,7 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
 		wordPtr = wordPtr->next;
 	}
 
-    // If wordPtr==NULL, word is not in hashmap, call init_wordNode
+    // If wordPtr==NULL, word is not in hashtable, call init_wordNode
     wordPtr = (struct wordNode*) malloc (sizeof (struct wordNode));
     init_wordNode (wordPtr, word, doc_id);
 
@@ -137,75 +137,71 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
 }
 
 /**
- * Removes the key value pair associated with the given key
- * @param hm			pointer to hashmap
- * @param word			to remove
- * @param document_id   this word is in
+ * Deallocate the given list of docNodes.
+ * @param docPtr pointer to head of the list
  */
-void hm_remove(struct hashmap* hm, char* word, char* document_id) {
-	// Get the bucket this word would be in
-	int hashCode = hash (hm, word, document_id);
+void destory_docList (struct docNode* docPtr) {
+    // Temporary ptr
+    struct docNode* temp = NULL;
 
-    // Set pointer to point to correct bucket
-	struct llnode* nodePtr = hm->map[hashCode];
-	// Pointer to track node before nodePtr (so we can stich list together after removal)
-	struct llnode* temp = NULL;
+    // Loop through the docNodes
+    while (docPtr != NULL) {
+        // Free the char* to doc_id
+        free (docPtr->doc_id);
 
-    // If the word is NULL in this bucket, the word does not exist in the list
-    if (nodePtr->word == NULL) {
-        return;
+        // Free current node while maintaining access to the rest of list
+        temp = docPtr;
+        docPtr = docPtr->next;
+        free (temp);
     }
-
-    // While the word is not NULL and either does not equal the word we are trying to
-    // insert or does not equal the document_id, move to next node in list
-	while (nodePtr != NULL) {
-
-		// If we've found the word already in hashmap, remove it
-		if (strcmp (nodePtr->word, word) == 0 && strcmp (nodePtr->document_id, document_id) == 0) {
-
-			// If this isn't the head of list, stich the adjacent nodes together
-			if (temp != NULL) {
-				temp->next = nodePtr->next;
-			}
-			// Now free the node
-			free (nodePtr);
-			// Decrement num_elements
-			hm->num_elements--;
-
-			return;
-		}
-		temp = nodePtr;
-		nodePtr = nodePtr->next;
-	}
 }
 
 /**
- * Deallocate the hashmap and all of its elements
- * @param hm   pointer to the hashmap
+ * Deallocate the given list of wordNodes.
+ * @param wordPtr pointer to head of the list
  */
-void hm_destroy(struct hashmap* hm){
-	// Loop through each bucket
-	for (int i = 0; i < hm->num_buckets; i++) {
+void destory_wordList (struct wordNode* wordPtr) {
+    // Temporary ptr
+    struct wordNode* temp = NULL;
 
-		// Points to head of the list
-		struct llnode* head = hm->map[i];
-		// Temporary node pointer
-		struct llnode* temp = NULL;
+    // Loop through the wordNodes
+    while (wordPtr != NULL) {
+        // Free list of docs at each word
+        destory_docList (wordPtr->docHead);
 
-		// Loop through each node in the list by setting head to the next
-		// node and then freeing the current one
-		while (head != NULL) {
-			temp = head;
-			head = head->next;
-			free (temp);
-		}
+        // Free the char* to word
+        free (wordPtr->word);
+
+        // Free current node while maintaining access to the rest of list
+        temp = wordPtr;
+        wordPtr = wordPtr->next;
+        free (temp);
+    }
+}
+
+/**
+ * Deallocate this hashtable.
+ * @param ht pointer to hashtable
+ */
+void ht_destroy (struct hashtable* ht) {
+	// Loop through each bucket, destroying the list of words in each one
+	for (int i = 0; i < ht->num_buckets; i++) {
+        destory_wordList (ht->map[i]);
 	}
-	free (hm);
+
+    // Free list of docs
+    for (int i = 0; i < ht->num_files; i++) {
+        free (ht->fileNames[i]);
+    }
+    free (ht->fileNames);
+
+    // Finally, free hashtable struct
+	free (ht);
 }
 
 /**
  * Hashing function to determine which bucket this word belongs in.
- * @param ht      pointer to the hashmap
+ * @param ht      pointer to the hashtable
  * @param word    char* to word we need to add
  * @return the hash code of this word and doc_id pair
  */

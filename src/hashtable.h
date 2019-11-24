@@ -24,8 +24,8 @@ struct hashtable {
         struct wordNode** map;
         int num_buckets;
         int num_elements;
-        char** docs;
-        int num_docs;
+        char** fileNames;
+        int num_files;
 };
 
 /**
@@ -41,31 +41,33 @@ struct hashtable* ht_create (int num_buckets);
  */
 void init_docNode (struct docNode* docPtr, char* doc_id);
 /**
- * Initialize a new word node with the given parameters.\
+ * Initialize a new word node with the given parameters.
  * @param wordPtr pointer to the wordNode to edit
  * @param word    char* to word we need to add
  * @param doc_id  char* to doc_id word belongs to
  */
-struct wordNode* init_wordNode (char* word, char* doc_id);
+void init_wordNode (struct wordNode* wordPtr, char* word, char* doc_id);
 /**
  * (1) Inserts this word and doc_id pair into hashtable along with the
  *     corresponding docNode for which this word occurs in.
  * (2) If the word and doc_id pair already exists, update its tf.
  * (3) If the word exists but in a different document,
  *     add new doc_id and update its df.
- * @param ht      pointer to the hashmap
+ * @param ht      pointer to the hashtable
  * @param word    char* to word we need to add
  * @param doc_id  char* to doc_id word belongs to
  */
 void ht_insert (struct hashtable* ht, char* word, char* doc_id);
 /**
- * Remove this word and doc_id pair from hashtable.
- * Function is used to remove stop words.
- * @param ht      pointer to the hashmap
- * @param word    char* to word we need to add
- * @param doc_id  char* to doc_id word belongs to
+ * Deallocate the given list of docNodes.
+ * @param docPtr pointer to head of the list
  */
-void ht_remove (struct hashtable* ht, char* word, char* doc_id);
+void destory_docList (struct docNode* docPtr);
+/**
+ * Deallocate the given list of wordNodes.
+ * @param wordPtr pointer to head of the list
+ */
+void destory_wordList (struct wordNode* wordPtr);
 /**
  * Deallocate this hashtable.
  * @param ht pointer to hashtable
@@ -73,7 +75,7 @@ void ht_remove (struct hashtable* ht, char* word, char* doc_id);
 void ht_destroy (struct hashtable* ht);
 /**
  * Hashing function to determine which bucket this word belongs in.
- * @param ht      pointer to the hashmap
+ * @param ht      pointer to the hashtable
  * @param word    char* to word we need to add
  * @return the hash code of this word and doc_id pair
  */
