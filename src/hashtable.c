@@ -39,21 +39,31 @@ struct hashtable* ht_create (int num_buckets) {
 }
 
 /**
+ * Initialize a new docNode with the given parameters.
+ * @param docPtr  pointer to the docNode to edit
+ * @param doc_id  char* to doc_id word belongs to
+ */
+void init_docNode (struct docNode* docPtr, char* doc_id) {
+    wordPtr->docHead->doc_id = doc_id;
+    wordPtr->docHead->tf = 1;
+    wordPtr->docHead->next = NULL;
+}
+
+/**
  * Initialize a new word node with the given parameters.
+ * @param wordPtr pointer to the wordNode to edit
  * @param word    char* to word we need to add
  * @param doc_id  char* to doc_id word belongs to
  */
-void init_wordNode (struct wordNode* wn, char* word, char* doc_id) {
+void init_wordNode (struct wordNode* wordPtr, char* word, char* doc_id) {
     // Initialize fields of wordNode
-    wn->word = word;
-    wn->df = 1;
-    wn->docHead = (struct docNode*) malloc (sizeof (struct docNode));
-    wn->next = NULL;
+    wordPtr->word = word;
+    wordPtr->df = 1;
+    wordPtr->docHead = (struct docNode*) malloc (sizeof (struct docNode));
+    wordPtr->next = NULL;
 
-    // Initialize fields of docNode associated with this wordNode
-    wn->docHead->doc_id = doc_id;
-    wn->docHead->tf = 1;
-    wn->docHead->next = NULL;
+    // Initialize fields of docNode
+    init_docNode (wordPtr->docHead, doc_id);
 }
 
 /**
@@ -71,37 +81,56 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
 	int hashCode = hash_code (ht, word);
 
     // Set pointer to point to correct bucket
-	struct wordNode* nodePtr = ht->map[hashCode];
+	struct wordNode* wordPtr = ht->map[hashCode];
 
     // If the first word in the bucket is NULL, then call init_wordNode() to fill it
-	if (nodePtr->word == NULL) {
-        init_wordNode (nodePtr, word, doc_id);
+	if (wordPtr->word == NULL) {
+        init_wordNode (wordPtr, word, doc_id);
         // Increment num_elements
     	ht->num_elements++;
         return;
 	}
 
 	// Temporary pointer to track node before the one we are looking at,
-	// this way we can set the nodePtr->next to the correct node
+	// this way we can set the wordPtr->next to the correct node
 	struct wordNode* lastPtr = NULL;
 
     // While the word is not NULL continue on through list
-	while (nodePtr != NULL) {
+	while (wordPtr != NULL) {
 		// If we've found the word already in hashmap, we only need to update its fields
-		if (strcmp (nodePtr->word, word) == 0) {
-            // TODO: Check the docNodes
+		if (strcmp (wordPtr->word, word) == 0) {
+            // Continue through docNodes until we find the right doc
+            struct docNode* docPtr = wordPtr->docHead;
+            struct docNode* lastDocPtr = NULL;
+            while (docPtr != NULL) {
+                // If the doc already exists, increment its tf
+                if (strcmp (docPtr->doc_id, doc_id) == 0) {
+                    docPtr->tf += 1;
+                    return;
+                }
+                lastDocPtr = docPtr;
+                docPtr = docPtr->next;
+            }
+            // Else, this word is in a new doc
+            docPtr = (struct docNode*) malloc (sizeof (struct docNode));
+            init_docNode (docPtr, doc_id);
+
+            // Stitch the last docNode to this one
+            lastDocPtr->next = docPtr;
+
+            return;
 		}
-		// Else, continue on to next node
-		lastPtr = nodePtr;
-		nodePtr = nodePtr->next;
+		// If this is not the word we are trying to insert, continue to next node
+		lastPtr = wordPtr;
+		wordPtr = wordPtr->next;
 	}
 
-    // If nodePtr==NULL, word is not in hashmap, call init_wordNode
-    nodePtr = (struct wordNode*) malloc (sizeof (struct wordNode));
-    init_wordNode (nodePtr, word, doc_id);
+    // If wordPtr==NULL, word is not in hashmap, call init_wordNode
+    wordPtr = (struct wordNode*) malloc (sizeof (struct wordNode));
+    init_wordNode (wordPtr, word, doc_id);
 
-	// Set node before the one's next to this node
-	lastPtr->next = nodePtr;
+	// Set node before this one's next to this node
+	lastPtr->next = wordPtr;
 
 	// Increment num_elements
 	ht->num_elements++;

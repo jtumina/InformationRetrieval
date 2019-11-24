@@ -35,7 +35,14 @@ struct hashtable {
  */
 struct hashtable* ht_create (int num_buckets);
 /**
- * Initialize a new word node with the given parameters.
+ * Initialize a new docNode with the given parameters.
+ * @param docPtr  pointer to the docNode to edit
+ * @param doc_id  char* to doc_id word belongs to
+ */
+void init_docNode (struct docNode* docPtr, char* doc_id);
+/**
+ * Initialize a new word node with the given parameters.\
+ * @param wordPtr pointer to the wordNode to edit
  * @param word    char* to word we need to add
  * @param doc_id  char* to doc_id word belongs to
  */
