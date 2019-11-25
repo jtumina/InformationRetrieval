@@ -1,8 +1,8 @@
-/*****************************************
+/**************************************************************************************
 * Jack Umina
 * Created Nov, 2019
 * Represents a hashtable data structure.
-*****************************************/
+***************************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +18,13 @@ struct hashtable* ht_create (int num_buckets) {
     // Initialize space for ht
 	struct hashtable* ht = (struct hashtable*) malloc (sizeof (struct hashtable));
 
+    // Check for allocation errors
+    if (ht == NULL) {
+        printf("Error: unable to allocate memory for hashtable\n");
+        return NULL;
+    }
+
+    // Initialize fields of hashtable
     ht->map = (struct wordNode**) malloc (num_buckets * sizeof (struct wordNode*));
 	ht->num_buckets = num_buckets;
 	ht->num_elements = 0;
@@ -140,7 +147,7 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
  * Deallocate the given list of docNodes.
  * @param docPtr pointer to head of the list
  */
-void destory_docList (struct docNode* docPtr) {
+void destroy_docList (struct docNode* docPtr) {
     // Temporary ptr
     struct docNode* temp = NULL;
 
@@ -160,7 +167,7 @@ void destory_docList (struct docNode* docPtr) {
  * Deallocate the given list of wordNodes.
  * @param wordPtr pointer to head of the list
  */
-void destory_wordList (struct wordNode* wordPtr) {
+void destroy_wordList (struct wordNode* wordPtr) {
     // Temporary ptr
     struct wordNode* temp = NULL;
 

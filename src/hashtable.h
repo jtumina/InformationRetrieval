@@ -1,8 +1,8 @@
-/*****************************************
+/**************************************************************************************
 * Jack Umina
 * Created Nov, 2019
 * Represents a hashtable data structure.
-*****************************************/
+***************************************************************************************/
 
 #ifndef hashtable_H
 #define hashtable_H
@@ -62,12 +62,12 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id);
  * Deallocate the given list of docNodes.
  * @param docPtr pointer to head of the list
  */
-void destory_docList (struct docNode* docPtr);
+void destroy_docList (struct docNode* docPtr);
 /**
  * Deallocate the given list of wordNodes.
  * @param wordPtr pointer to head of the list
  */
-void destory_wordList (struct wordNode* wordPtr);
+void destroy_wordList (struct wordNode* wordPtr);
 /**
  * Deallocate this hashtable.
  * @param ht pointer to hashtable
