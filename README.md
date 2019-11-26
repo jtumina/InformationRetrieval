@@ -3,7 +3,8 @@ Implements TF-IDF algorithm in C to rank sets of text files according to their r
 
 ## TODO List:
 #### Finish rank()
-    - [ ] Split up calculating tf-idf into different function
+    - [X] Split up calculating tf-idf into different function
     - [ ] Sort the list of relevancy scores and thus, sort doc_ids
+        - [ ] Implement sort using qsort()
 #### Finish train()
     - [ ] Maybe method to read file?

@@ -118,6 +118,39 @@ char** read_query () {
 }
 
 /**
+ * Computes the tf-idf score for this document and givens set of search terms
+ * @param  ht           pointer to the hashtable we are working with
+ * @param  search_query string array of search terms
+ * @param  doc_id       char* to the doc_id we are computing tf-idf for
+ * @return              the relevancy score of this doc_id against the given search_query
+ */
+double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) {
+    // Relevancy score for this doc
+    double r = 0;
+
+    // Compute the length of the search_query
+    int query_length = (int) (sizeof (search_query)/ sizeof (char*));
+
+    // Loop through words in search_query
+    for (int j = 0; j < query_length; j++) {
+        // Find the word in the hashtable
+        struct wordNode* wordPtr = get_word (ht, search_query[j]);
+
+        // Get the tf and idf for this word, doc_id pair
+        int tf = get_tf (ht, wordPtr);
+        int idf = get_idf (ht, wordPtr, doc_id);
+
+        // Compute tf*idf and add it to the score for this doc
+        r += (tf * idf);
+    }
+    return r;
+}
+
+void sort (struct relevancy_score** scores) {
+
+}
+
+/**
  * Computes tf-idf score for each document.
  * @param  ht           pointer to the hashtable
  * @param search_query  string array of search terms
@@ -125,25 +158,19 @@ char** read_query () {
  *         or NULL if search query does not appear in any document.
  */
 char* rank (struct hashtable* ht, char** search_query) {
-    // Array of relevancy scores for each doc,
-    // where r[i] is the relevancy score of docIDS[i]
-    double r[ht->num_docs];
+    // Array of relevancy_score structs
+    struct relevancy_score** scores =
+        (struct relevancy_score**) malloc (ht->num_docs * sizeof (struct relevancy_score*));
 
-    int query_length = (int) (sizeof (search_query)/ sizeof (char*));
-
-    // Loop through documents
+    // Loop through documents and compute tf-idf for each one,
     for (int i = 0; i < ht->num_docs; i++) {
-        // Loop through words in search_query
-        for (int j = 0; j < query_length; j++) {
-            // Find the word in the hashtable
-            struct wordNode* wordPtr = get_word (ht, search_query[j]);
-
-            // Get the tf and idf for this word, doc_id pair
-            int tf = get_tf (ht, wordPtr);
-            int idf = get_idf (ht, wordPtr, doc_id);
-
-            // Compute tf*idf and add it to the score for this doc
-            r[i] += (tf * idf);
-        }
+        scores[i] = (struct relevancy_score*) malloc (sizeof (struct relevancy_score));
+        scores[i]->doc_id = ht->docIDs[i];
+        scores[i]->score = compute_tf_idf (ht, search_query, ht->docIDs[i]);
     }
+    // Sort the doc_ids according to their tf-idf scores
+    sort (scores);
+
+    // Now, the relevancy_score at index 0 should contain the doc_id with the highest score
+    return scores[0]->doc_id;
 }

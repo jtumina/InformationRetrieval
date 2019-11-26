@@ -8,6 +8,11 @@
 #ifndef infoRetrieval_H
 #define infoRetrieval_H
 
+struct relevancy_score {
+    char* doc_id;
+    double score;
+};
+
 /**
  * Computes the idf of the given word.
  * idf = log (N / df) ,
@@ -41,6 +46,14 @@ int train (struct hashtable* ht, char** docs);
  * @return array of strings where each string is each search term
  */
 char** read_query ();
+/**
+ * Computes the tf-idf score for this document and givens set of search terms
+ * @param  ht           pointer to the hashtable we are working with
+ * @param  search_query string array of search terms
+ * @param  doc_id       char* to the doc_id we are computing tf-idf for
+ * @return              the relevancy score of this doc_id against the given search_query
+ */
+double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id);
 /**
  * Computes tf-idf score for each document.
  * @param  ht           pointer to the hashtable
