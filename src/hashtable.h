@@ -24,8 +24,8 @@ struct hashtable {
         struct wordNode** map;
         int num_buckets;
         int num_elements;
-        char** fileNames;
-        int num_files;
+        char** docIDs;
+        int num_docs;
 };
 
 /**
@@ -80,5 +80,12 @@ void ht_destroy (struct hashtable* ht);
  * @return the hash code of this word and doc_id pair
  */
 int hash_code (struct hashtable* ht, char* word);
+/**
+ * Searches the given hashtable for this word..
+ * @param  ht      pointer to the hashtable to search in
+ * @param  word    char* to the word to search for
+ * @return pointer to the wordNode this word belongs
+ */
+int get_word (struct hashtable* ht, char* word);
 
 #endif

@@ -20,14 +20,51 @@
  * @param  wn pointer to a wordNode
  * @return the computed idf
  */
-double compute_idf (struct hashtable ht, struct wordNode* wordPtr) {
+double get_idf (struct hashtable ht, struct wordNode* wordPtr) {
     double N = ht->num_files;
-    double df = wordPtr->df;
+    double df = 0;
 
-    // If df == 0, set it to 1 to prevent divide by 0 errors
-    df = (df == 0) ? 1 : df;
+    // Check to make sure word exists before accessing
+    if (wordPtr != NULL) {
+        df = wordPtr->df;
+    } else { // Add 1 to df to prevent divide by 0
+        df++;
+    }
 
     return log (N / df);
+}
+
+/**
+ * Searches the given hashtable for this word and doc_id pair.
+ * @param  ht      pointer to the hashtable to search in
+ * @param  word    char* to the word to search for
+ * @param  doc_id  char* to the document this word belongs in
+ * @return the tf of this word in this doc_id
+ */
+int get_tf (struct hashtable* ht, char* word, char* doc_id) {
+    // Get wordNode this word resides in
+    struct wordNode* wordPtr = get_word (ht, word);
+
+    // If wordPtr == NULL, word doesn't exists in hashtable, tf = 0
+    if (wordPtr == NULL) {
+        return 0;
+    }
+
+    // Set pointer to head of doc list
+    struct docNode* docPtr = wordPtr->docHead;
+
+    // Loop through doc list searching for the document
+    while (docPtr != NULL && strcmp (docPtr->doc_id, doc_id) != 0) {
+        docPtr = docPtr->next;
+    }
+
+    // If we reached NULL, this word does not belong in the particular document
+    if (docPtr == NULL) {
+        return NULL;
+    }
+
+    // Else, we found the word
+    return docPtr->tf;
 }
 
 /**
@@ -47,13 +84,13 @@ void stop_words (struct hashtable* ht) {
         while (wordPtr != NULL) {
             // If the idf of this word == 0, it is a stop word and we need to remove it
             if (compute_idf (ht, wordPtr) == 0) {
-                // Free the char* to the word
+                // Free the fields of this wordPtr
                 free (wordPtr->word);
-                // Free the doc list for this word
                 destroy_docList (wordPtr->docHead);
+
                 // Stich the node before this to the one after this
                 lastPtr->next = wordPtr->next;
-                // Now free the wordNode itself
+
                 free (wordPtr);
             }
             lastPtr = wordPtr;
@@ -82,11 +119,31 @@ char** read_query () {
 
 /**
  * Computes tf-idf score for each document.
- * @param  ht    pointer to the hashtable
- * @param  docs  list of all documents in hashtable
+ * @param  ht           pointer to the hashtable
+ * @param search_query  string array of search terms
  * @return doc_id of the document with highest tf-idf score
  *         or NULL if search query does not appear in any document.
  */
-char* rank (struct hashtable* ht) {
+char* rank (struct hashtable* ht, char** search_query) {
+    // Array of relevancy scores for each doc,
+    // where r[i] is the relevancy score of docIDS[i]
+    double r[ht->num_docs];
 
+    int query_length = (int) (sizeof (search_query)/ sizeof (char*));
+
+    // Loop through documents
+    for (int i = 0; i < ht->num_docs; i++) {
+        // Loop through words in search_query
+        for (int j = 0; j < query_length; j++) {
+            // Find the word in the hashtable
+            struct wordNode* wordPtr = get_word (ht, search_query[j]);
+
+            // Get the tf and idf for this word, doc_id pair
+            int tf = get_tf (ht, wordPtr);
+            int idf = get_idf (ht, wordPtr, doc_id);
+
+            // Compute tf*idf and add it to the score for this doc
+            r[i] += (tf * idf);
+        }
+    }
 }

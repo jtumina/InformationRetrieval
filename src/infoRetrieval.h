@@ -15,7 +15,15 @@
  * @param  wn pointer to a wordNode
  * @return the computed idf
  */
-int compute_idf (struct hashtable ht, struct wordNode* wordPtr);
+int get_idf (struct hashtable ht, struct wordNode* wordPtr);
+/**
+ * Searches the given hashtable for this word and doc_id pair.
+ * @param  ht      pointer to the hashtable to search in
+ * @param  word    char* to the word to search for
+ * @param  doc_id  char* to the document this word belongs in
+ * @return the tf of this word in this doc_id
+ */
+int get_tf (struct hashtable* ht, char* word, char* doc_id);
 /**
  * Removes all words in hash table whose idf = 0.
  * @param ht pointer to the hashtable
@@ -35,11 +43,11 @@ int train (struct hashtable* ht, char** docs);
 char** read_query ();
 /**
  * Computes tf-idf score for each document.
- * @param  ht    pointer to the hashtable
- * @param  docs  list of all documents in hashtable
+ * @param  ht           pointer to the hashtable
+ * @param search_query  string array of search terms
  * @return doc_id of the document with highest tf-idf score
  *         or NULL if search query does not appear in any document.
  */
-char* rank (struct hashtable* ht);
+char* rank (struct hashtable* ht, char** search_query);
 
 #endif

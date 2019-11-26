@@ -28,8 +28,8 @@ struct hashtable* ht_create (int num_buckets) {
     ht->map = (struct wordNode**) malloc (num_buckets * sizeof (struct wordNode*));
 	ht->num_buckets = num_buckets;
 	ht->num_elements = 0;
-    ht->fileNames = NULL;
-    ht->num_files = 0;
+    ht->docIDs = NULL;
+    ht->num_docs = 0;
 
     // Initialize space for a wordNode pointer in each bucket
 	for (int i = 0; i < num_buckets; i++) {
@@ -197,10 +197,10 @@ void ht_destroy (struct hashtable* ht) {
 	}
 
     // Free list of docs
-    for (int i = 0; i < ht->num_files; i++) {
-        free (ht->fileNames[i]);
+    for (int i = 0; i < ht->num_docs; i++) {
+        free (ht->docIDs[i]);
     }
-    free (ht->fileNames);
+    free (ht->docIDs);
 
     // Finally, free hashtable struct
 	free (ht);
@@ -225,4 +225,36 @@ int hash_code (struct hashtable* ht, char* word) {
 
 	// Return the sum % num_buckets to keep range consitent
 	return sum % ht->num_buckets;
+}
+
+/**
+ * Searches the given hashtable for this word..
+ * @param  ht      pointer to the hashtable to search in
+ * @param  word    char* to the word to search for
+ * @return pointer to the wordNode this word belongs
+ */
+struct wordNode* get_word (struct hashtable* ht, char* word) {
+    // Get the bucket this word would belong to
+    int hashCode = hash_code (ht, word);
+
+    // Set pointer to head of word list at this bucket
+    struct wordNode* wordPtr = ht->map[hashCode];
+
+    // If the word at this bucket is NULL, word does not exist in the list
+    if (wordPtr->word == NULL) {
+        return NULL;
+    }
+
+    // Loop through word list searching for word
+    while (nodePtr != NULL && strcmp (wordPtr->word, word) != 0) {
+        wordPtr = wordPtr->next;
+    }
+
+    // If we reached NULL, word does not exist in this hashtable
+    if (wordPtr == NULL) {
+        return NULL;
+    }
+
+    // Else, we have found the word
+    return wordPtr;
 }
