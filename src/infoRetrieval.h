@@ -21,6 +21,7 @@ struct relevancy_score {
  * @return the computed idf
  */
 int get_idf (struct hashtable ht, struct wordNode* wordPtr);
+
 /**
  * Searches the given hashtable for this word and doc_id pair.
  * @param  ht      pointer to the hashtable to search in
@@ -29,11 +30,13 @@ int get_idf (struct hashtable ht, struct wordNode* wordPtr);
  * @return the tf of this word in this doc_id
  */
 int get_tf (struct hashtable* ht, char* word, char* doc_id);
+
 /**
  * Removes all words in hash table whose idf = 0.
  * @param ht pointer to the hashtable
  */
 void stop_words (struct hashtable* ht);
+
 /**
  * Takes a set of documents and populates the hashtable.
  * @param  ht    pointer to the hashtable
@@ -41,11 +44,13 @@ void stop_words (struct hashtable* ht);
  * @return 1 if succesful and 0 if not
  */
 int train (struct hashtable* ht, char** docs);
+
 /**
  * Reads in search query from user at console.
  * @return array of strings where each string is each search term
  */
 char** read_query ();
+
 /**
  * Computes the tf-idf score for this document and givens set of search terms
  * @param  ht           pointer to the hashtable we are working with
@@ -54,6 +59,7 @@ char** read_query ();
  * @return              the relevancy score of this doc_id against the given search_query
  */
 double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id);
+
 /**
  * Computes tf-idf score for each document.
  * @param  ht           pointer to the hashtable

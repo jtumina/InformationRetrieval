@@ -34,12 +34,14 @@ struct hashtable {
  * @return pointer to this hashtable
  */
 struct hashtable* ht_create (int num_buckets);
+
 /**
  * Initialize a new docNode with the given parameters.
  * @param docPtr  pointer to the docNode to edit
  * @param doc_id  char* to doc_id word belongs to
  */
 void init_docNode (struct docNode* docPtr, char* doc_id);
+
 /**
  * Initialize a new word node with the given parameters.
  * @param wordPtr pointer to the wordNode to edit
@@ -47,6 +49,7 @@ void init_docNode (struct docNode* docPtr, char* doc_id);
  * @param doc_id  char* to doc_id word belongs to
  */
 void init_wordNode (struct wordNode* wordPtr, char* word, char* doc_id);
+
 /**
  * (1) Inserts this word and doc_id pair into hashtable along with the
  *     corresponding docNode for which this word occurs in.
@@ -58,21 +61,25 @@ void init_wordNode (struct wordNode* wordPtr, char* word, char* doc_id);
  * @param doc_id  char* to doc_id word belongs to
  */
 void ht_insert (struct hashtable* ht, char* word, char* doc_id);
+
 /**
  * Deallocate the given list of docNodes.
  * @param docPtr pointer to head of the list
  */
 void destroy_docList (struct docNode* docPtr);
+
 /**
  * Deallocate the given list of wordNodes.
  * @param wordPtr pointer to head of the list
  */
 void destroy_wordList (struct wordNode* wordPtr);
+
 /**
  * Deallocate this hashtable.
  * @param ht pointer to hashtable
  */
 void ht_destroy (struct hashtable* ht);
+
 /**
  * Hashing function to determine which bucket this word belongs in.
  * @param ht      pointer to the hashtable
@@ -80,6 +87,7 @@ void ht_destroy (struct hashtable* ht);
  * @return the hash code of this word and doc_id pair
  */
 int hash_code (struct hashtable* ht, char* word);
+
 /**
  * Searches the given hashtable for this word..
  * @param  ht      pointer to the hashtable to search in

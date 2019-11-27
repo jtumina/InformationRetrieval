@@ -11,7 +11,7 @@
 #include <math.h>
 
 #include "hashtable.h"
-#include "infoRetrieval"
+#include "infoRetrieval.h"
 
 /**
  * Computes the idf of the given word.
@@ -146,21 +146,15 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
     return r;
 }
 
-void sort (struct relevancy_score** scores) {
-
-}
-
 /**
- * Computes tf-idf score for each document.
+ * Ranks the documents in order of their tf-idf scores and outputs results.
  * @param  ht           pointer to the hashtable
  * @param search_query  string array of search terms
- * @return doc_id of the document with highest tf-idf score
- *         or NULL if search query does not appear in any document.
  */
-char* rank (struct hashtable* ht, char** search_query) {
+void rank (struct hashtable* ht, char** search_query) {
     // Array of relevancy_score structs
-    struct relevancy_score** scores =
-        (struct relevancy_score**) malloc (ht->num_docs * sizeof (struct relevancy_score*));
+    struct relevancy_score* scores
+        = (struct relevancy_score*) malloc (sizeof (struct relevancy_score));
 
     // Loop through documents and compute tf-idf for each one,
     for (int i = 0; i < ht->num_docs; i++) {
@@ -171,6 +165,5 @@ char* rank (struct hashtable* ht, char** search_query) {
     // Sort the doc_ids according to their tf-idf scores
     sort (scores);
 
-    // Now, the relevancy_score at index 0 should contain the doc_id with the highest score
-    return scores[0]->doc_id;
+    // TODO: Output results
 }
