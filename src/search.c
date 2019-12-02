@@ -4,6 +4,6 @@
 
 #include "infoRetrieval.h"
 
-int main () {
-
+int main (char* argc) {
+	
 }

@@ -174,7 +174,7 @@ void destroy_wordList (struct wordNode* wordPtr) {
     // Loop through the wordNodes
     while (wordPtr != NULL) {
         // Free list of docs at each word
-        destory_docList (wordPtr->docHead);
+        destroy_docList (wordPtr->docHead);
 
         // Free the char* to word
         free (wordPtr->word);
@@ -193,7 +193,7 @@ void destroy_wordList (struct wordNode* wordPtr) {
 void ht_destroy (struct hashtable* ht) {
 	// Loop through each bucket, destroying the list of words in each one
 	for (int i = 0; i < ht->num_buckets; i++) {
-        destory_wordList (ht->map[i]);
+        destroy_wordList (ht->map[i]);
 	}
 
     // Free list of docs
@@ -246,7 +246,7 @@ struct wordNode* get_word (struct hashtable* ht, char* word) {
     }
 
     // Loop through word list searching for word
-    while (nodePtr != NULL && strcmp (wordPtr->word, word) != 0) {
+    while (wordPtr != NULL && strcmp (wordPtr->word, word) != 0) {
         wordPtr = wordPtr->next;
     }
 

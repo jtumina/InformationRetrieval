@@ -94,6 +94,6 @@ int hash_code (struct hashtable* ht, char* word);
  * @param  word    char* to the word to search for
  * @return pointer to the wordNode this word belongs
  */
-int get_word (struct hashtable* ht, char* word);
+struct wordNode* get_word (struct hashtable* ht, char* word);
 
 #endif
