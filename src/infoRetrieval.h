@@ -40,10 +40,9 @@ void stop_words (struct hashtable* ht);
 /**
  * Takes a set of documents and populates the hashtable.
  * @param  ht    pointer to the hashtable
- * @param  docs  the set of documents to be added
  * @return 1 if succesful and 0 if not
  */
-int train (struct hashtable* ht, char** docs);
+int train (struct hashtable* ht);
 
 /**
  * Reads in search query from user at console.
@@ -59,6 +58,13 @@ char** read_query ();
  * @return              the relevancy score of this doc_id against the given search_query
  */
 double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id);
+
+/**
+ * Print the contents of the most relvant document to console and list all files and their scores
+ * in order in search_scores.txt
+ * @param scores array of relevancy_scores
+ */
+void output_results (struct relevancy_score* scores);
 
 /**
  * Computes tf-idf score for each document.

@@ -21,7 +21,7 @@
  * @return the computed idf
  */
 double get_idf (struct hashtable ht, struct wordNode* wordPtr) {
-    double N = ht->num_files;
+    double N = ht->num_docs;
     double df = 0;
 
     // Check to make sure word exists before accessing
@@ -102,11 +102,29 @@ void stop_words (struct hashtable* ht) {
 /**
  * Takes a set of documents and populates the hashtable.
  * @param  ht    pointer to the hashtable
- * @param  docs  the set of documents to be added
  * @return 1 if succesful and 0 if not
  */
-int train (struct hashtable* ht, char** docs) {
+int train (struct hashtable* ht) {
+    // Pointer to file
+    FILE* f;
+    char* buf[22];
 
+    // Loop through the set of documents
+    for (int i = 0; i < ht->num_docs; i++) {
+        f = fopen (ht->docIDs[i], "r");
+
+        // Check for NULL files
+        if (f == NULL) {
+            printf("Error: %s is NULL.\n", ht->docIDs[i]);
+            return 0;
+        }
+
+        // Loop through file, adding each word to the hashtable
+        while (fscanf (f, "%s", buf) != NULL) {
+            ht_insert (ht, buf, ht->docIDs[i]);
+        }
+    }
+    return 1;
 }
 
 /**
@@ -114,7 +132,8 @@ int train (struct hashtable* ht, char** docs) {
  * @return array of strings where each string is each search term
  */
 char** read_query () {
-
+    char** words;
+    return words;
 }
 
 /**
@@ -147,6 +166,43 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
 }
 
 /**
+ * Print the contents of the most relvant document to console and list all files and their scores
+ * in order in search_scores.txt
+ * @param scores array of relevancy_scores
+ */
+void output_results (struct relevancy_score* scores) {
+    // Open the file with the highest relevancy score
+    FILE* f = fopen (scores[0]->doc_id, "r");
+
+    // Check for NULL to prevent crash
+    if (f == NULL) {
+        printf("Error: %s is NULL.\n", scores[0]->doc_id);
+        return;
+    }
+
+    // Print the cotents of the file, char by char
+    char c;
+    while (c = getc (f) != EOF) {
+        printf("%c\n", c);
+    }
+
+    fclose (f);
+
+    // Create search_scores.txt
+    f = fopen ("search_scores.txt", "w");
+
+    // Get length of scores
+    int len = (int) (sizeof (scores) / sizeof (scores[0]));
+
+    // Print each file and its score
+    for (int i = 0; i < len; i++) {
+        fputs ("%s:%f\n", scores[i]->doc_id, scores[i]->score);
+    }
+
+    fclose (f);
+}
+
+/**
  * Ranks the documents in order of their tf-idf scores and outputs results.
  * @param  ht           pointer to the hashtable
  * @param search_query  string array of search terms
@@ -166,4 +222,5 @@ void rank (struct hashtable* ht, char** search_query) {
     sort (scores);
 
     // TODO: Output results
+    output_results (scores);
 }
