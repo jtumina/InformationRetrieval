@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "hashtable.h"
 #include "infoRetrieval.h"
 
 /**
@@ -29,7 +28,7 @@ int comparator (const void *a, const void *b)
  * Function to sort an array of relevancy_score structs.
  * @param scores array to sort
  */
-void sort (struct relevancy_score* scores) {
+void sort (struct relevancy_score** scores) {
     // Get length of scores
     int scores_len = (int) (sizeof (scores) / sizeof (scores[0]));
 

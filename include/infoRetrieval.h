@@ -29,7 +29,7 @@ int get_idf (struct hashtable ht, struct wordNode* wordPtr);
  * @param  doc_id  char* to the document this word belongs in
  * @return the tf of this word in this doc_id
  */
-int get_tf (struct hashtable* ht, char* word, char* doc_id);
+int get_tf (struct hashtable* ht, struct wordNode* wordPtr, char* doc_id);
 
 /**
  * Removes all words in hash table whose idf = 0.
@@ -64,7 +64,7 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id);
  * in order in search_scores.txt
  * @param scores array of relevancy_scores
  */
-void output_results (struct relevancy_score* scores);
+void output_results (struct relevancy_score** scores);
 
 /**
  * Computes tf-idf score for each document.

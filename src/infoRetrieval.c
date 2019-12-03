@@ -12,6 +12,7 @@
 
 #include "hashtable.h"
 #include "infoRetrieval.h"
+#include "sort.h"
 
 /**
  * Computes the idf of the given word.
@@ -41,10 +42,7 @@ double get_idf (struct hashtable ht, struct wordNode* wordPtr) {
  * @param  doc_id  char* to the document this word belongs in
  * @return the tf of this word in this doc_id
  */
-int get_tf (struct hashtable* ht, char* word, char* doc_id) {
-    // Get wordNode this word resides in
-    struct wordNode* wordPtr = get_word (ht, word);
-
+int get_tf (struct hashtable* ht, struct wordNode* wordPtr, char* doc_id) {
     // If wordPtr == NULL, word doesn't exists in hashtable, tf = 0
     if (wordPtr == NULL) {
         return 0;
@@ -156,7 +154,7 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
         struct wordNode* wordPtr = get_word (ht, search_query[j]);
 
         // Get the tf and idf for this word, doc_id pair
-        int tf = get_tf (ht, wordPtr);
+        int tf = get_tf (ht, wordPtr, doc_id);
         int idf = get_idf (ht, wordPtr, doc_id);
 
         // Compute tf*idf and add it to the score for this doc
@@ -170,7 +168,7 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
  * in order in search_scores.txt
  * @param scores array of relevancy_scores
  */
-void output_results (struct relevancy_score* scores) {
+void output_results (struct relevancy_score** scores) {
     // Open the file with the highest relevancy score
     FILE* f = fopen (scores[0]->doc_id, "r");
 
@@ -209,8 +207,8 @@ void output_results (struct relevancy_score* scores) {
  */
 void rank (struct hashtable* ht, char** search_query) {
     // Array of relevancy_score structs
-    struct relevancy_score* scores
-        = (struct relevancy_score*) malloc (sizeof (struct relevancy_score));
+    struct relevancy_score** scores
+        = (struct relevancy_score**) malloc (ht->num_docs * sizeof (struct relevancy_score*));
 
     // Loop through documents and compute tf-idf for each one,
     for (int i = 0; i < ht->num_docs; i++) {
@@ -221,6 +219,5 @@ void rank (struct hashtable* ht, char** search_query) {
     // Sort the doc_ids according to their tf-idf scores
     sort (scores);
 
-    // TODO: Output results
     output_results (scores);
 }
