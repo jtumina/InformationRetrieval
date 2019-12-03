@@ -7,11 +7,11 @@ CFLAGS = -I$(INCLUDE_DIR) -Wall -Wextra -Werror -pedantic -std=gnu99 -pedantic -
 # directory paths
 INCLUDE_DIR = ./include/
 SRC_DIR = ./src/
-OBJ_DIR = ./
+OBJ_DIR = ./src/
 
 # file lists
 CFILES = $(wildcard ./src/*.c)
-OBJS = hashtable.o infoRetrieval.o sort.o search.o
+OBJS = ./src/hashtable.o ./src/infoRetrieval.o ./src/sort.o ./src/search.o
 
 # binary
 BIN = search

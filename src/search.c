@@ -4,6 +4,6 @@
 
 #include "infoRetrieval.h"
 
-int main (char* argc) {
-	
+int main (int argv, char** argc) {
+	printf ("%d %s", argv, argc[0]);
 }

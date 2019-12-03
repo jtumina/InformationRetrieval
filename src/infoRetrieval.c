@@ -21,7 +21,7 @@
  * @param  wn pointer to a wordNode
  * @return the computed idf
  */
-double get_idf (struct hashtable ht, struct wordNode* wordPtr) {
+double get_idf (struct hashtable* ht, struct wordNode* wordPtr) {
     double N = ht->num_docs;
     double df = 0;
 
@@ -37,12 +37,11 @@ double get_idf (struct hashtable ht, struct wordNode* wordPtr) {
 
 /**
  * Searches the given hashtable for this word and doc_id pair.
- * @param  ht      pointer to the hashtable to search in
  * @param  word    char* to the word to search for
  * @param  doc_id  char* to the document this word belongs in
  * @return the tf of this word in this doc_id
  */
-int get_tf (struct hashtable* ht, struct wordNode* wordPtr, char* doc_id) {
+int get_tf (struct wordNode* wordPtr, char* doc_id) {
     // If wordPtr == NULL, word doesn't exists in hashtable, tf = 0
     if (wordPtr == NULL) {
         return 0;
@@ -58,7 +57,7 @@ int get_tf (struct hashtable* ht, struct wordNode* wordPtr, char* doc_id) {
 
     // If we reached NULL, this word does not belong in the particular document
     if (docPtr == NULL) {
-        return NULL;
+        return 0;
     }
 
     // Else, we found the word
@@ -81,7 +80,7 @@ void stop_words (struct hashtable* ht) {
         // Loop through word list
         while (wordPtr != NULL) {
             // If the idf of this word == 0, it is a stop word and we need to remove it
-            if (compute_idf (ht, wordPtr) == 0) {
+            if (get_idf (ht, wordPtr) == 0) {
                 // Free the fields of this wordPtr
                 free (wordPtr->word);
                 destroy_docList (wordPtr->docHead);
@@ -127,9 +126,11 @@ int train (struct hashtable* ht) {
 
 /**
  * Reads in search query from user at console.
+ * @param str the string that needs to be split into separate words
  * @return array of strings where each string is each search term
  */
-char** read_query () {
+char** read_query (char* str) {
+    printf("%s\n", str);
     char** words;
     return words;
 }
@@ -146,7 +147,7 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
     double r = 0;
 
     // Compute the length of the search_query
-    int query_length = (int) (sizeof (search_query)/ sizeof (char*));
+    int query_length = (int) (sizeof (search_query) / sizeof (search_query[0]));
 
     // Loop through words in search_query
     for (int j = 0; j < query_length; j++) {
@@ -154,8 +155,8 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
         struct wordNode* wordPtr = get_word (ht, search_query[j]);
 
         // Get the tf and idf for this word, doc_id pair
-        int tf = get_tf (ht, wordPtr, doc_id);
-        int idf = get_idf (ht, wordPtr, doc_id);
+        int tf = get_tf (wordPtr, doc_id);
+        int idf = get_idf (ht, wordPtr);
 
         // Compute tf*idf and add it to the score for this doc
         r += (tf * idf);
@@ -180,7 +181,7 @@ void output_results (struct relevancy_score** scores) {
 
     // Print the cotents of the file, char by char
     char c;
-    while (c = getc (f) != EOF) {
+    while ((c = getc (f)) != EOF) {
         printf("%c\n", c);
     }
 
@@ -194,7 +195,7 @@ void output_results (struct relevancy_score** scores) {
 
     // Print each file and its score
     for (int i = 0; i < len; i++) {
-        fputs ("%s:%f\n", scores[i]->doc_id, scores[i]->score);
+        fprintf (f, "%s:%f\n", scores[i]->doc_id, scores[i]->score);
     }
 
     fclose (f);
