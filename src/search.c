@@ -12,9 +12,9 @@ int main (int argc, char** argv) {
     }
 
     char** docs = (char**) malloc (3 * sizeof (char*));
-    docs[0] = "D1.txt";
-    docs[1] = "D2.txt";
-    docs[2] = "D3.txt";
+    docs[0] = "./p5docs/D1.txt";
+    docs[1] = "./p5docs/D2.txt";
+    docs[2] = "./p5docs/D3.txt";
 
     struct hashtable* ht = ht_create ((int) argv[1]);
 
