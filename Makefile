@@ -5,13 +5,13 @@ CC = gcc
 CFLAGS = -I$(INCLUDE_DIR) -Wall -Wextra -Werror -pedantic -std=gnu99 -pedantic -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition -g
 
 # directory paths
-INCLUDE_DIR = ./include/
-SRC_DIR = ./src/
-OBJ_DIR = ./src/
+INCLUDE_DIR = ./include
+SRC_DIR = ./src
+OBJ_DIR = ./obj
 
 # file lists
-CFILES = $(wildcard ./src/*.c)
-OBJS = ./src/hashtable.o ./src/infoRetrieval.o ./src/sort.o ./src/search.o
+CFILES = $(wildcard $(SRC_DIR)/*.c)
+OBJS = ./obj/hashtable.o ./obj/infoRetrieval.o ./obj/sort.o ./obj/search.o
 
 # binary
 BIN = search
