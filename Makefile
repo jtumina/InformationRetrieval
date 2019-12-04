@@ -11,16 +11,16 @@ OBJ_DIR = ./obj
 
 # file lists
 CFILES = $(wildcard $(SRC_DIR)/*.c)
-OBJS = ./obj/hashtable.o ./obj/infoRetrieval.o ./obj/sort.o ./obj/search.o
+OBJS = ./obj/hashtable.o ./obj/infoRetrieval.o ./obj/sort.o ./obj/main.o
 
 # binary
-BIN = search
+BIN = main
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(BIN): $(OBJS)
-	$(CC) -o $@ $(OBJS)
+	$(CC) -o $@ $(OBJS) -lm
 
 clean:
-	rm -f $(OBJS) $(BIN) *~
+	rm -f $(OBJS) $(BIN) search_scores.txt *~
