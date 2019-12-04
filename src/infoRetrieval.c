@@ -104,7 +104,7 @@ void stop_words (struct hashtable* ht) {
 int train (struct hashtable* ht) {
     // Pointer to file
     FILE* f;
-    char* buf[22];
+    char buf[21];
 
     // Loop through the set of documents
     for (int i = 0; i < ht->num_docs; i++) {
@@ -117,7 +117,8 @@ int train (struct hashtable* ht) {
         }
 
         // Loop through file, adding each word to the hashtable
-        while (fscanf (f, "%s", buf) != NULL) {
+        // Assume no word exceeds 20 characters
+        while (fscanf (f, "%20s", buf) == 1) {
             ht_insert (ht, buf, ht->docIDs[i]);
         }
     }
@@ -126,31 +127,52 @@ int train (struct hashtable* ht) {
 
 /**
  * Reads in search query from user at console.
- * @param str the string that needs to be split into separate words
+ * @param str        the string that needs to be split into separate words
+ * @paran query_len  parameter will hold the length of the search_query
  * @return array of strings where each string is each search term
  */
-char** read_query (char* str) {
-    printf("%s\n", str);
-    char** words;
-    return words;
+char** read_query (char* str, int* query_len) {
+    char** search_query = (char**) malloc (sizeof (char*));
+
+    if (search_query == NULL) {
+        printf("Memory Error: Not enough space for search_query.\n");
+        exit (0);
+    }
+
+    int i = 0;
+
+    // Loop through str and extract each word
+    // Assume no word exceeds 20 characters
+    while ((search_query[i] = strtok (str, " ")) != NULL) {
+        // If we are not on the first word, realloc space for another word
+        if (i != 0) {
+            search_query = (char**) realloc (search_query, sizeof (char*));
+
+            if (search_query == NULL) {
+                printf("Memory Error: Not enough space for search_query.\n");
+                exit (0);
+            }
+        }
+        i++;
+    }
+    *query_len = i+1;
+    return search_query;
 }
 
 /**
  * Computes the tf-idf score for this document and givens set of search terms
  * @param  ht           pointer to the hashtable we are working with
  * @param  search_query string array of search terms
+ * @param  query_len    length of the search query
  * @param  doc_id       char* to the doc_id we are computing tf-idf for
  * @return              the relevancy score of this doc_id against the given search_query
  */
-double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) {
+double compute_tf_idf (struct hashtable* ht, char** search_query, int query_len, char* doc_id) {
     // Relevancy score for this doc
     double r = 0;
 
-    // Compute the length of the search_query
-    int query_length = (int) (sizeof (search_query) / sizeof (search_query[0]));
-
     // Loop through words in search_query
-    for (int j = 0; j < query_length; j++) {
+    for (int j = 0; j < query_len; j++) {
         // Find the word in the hashtable
         struct wordNode* wordPtr = get_word (ht, search_query[j]);
 
@@ -165,11 +187,12 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id) 
 }
 
 /**
- * Print the contents of the most relvant document to console and list all files and their scores
- * in order in search_scores.txt
+ * Print the contents of the most relvant document to console and list all files and
+ * their scores in order in search_scores.txt
+ * @param  ht           pointer to the hashtable we are working with
  * @param scores array of relevancy_scores
  */
-void output_results (struct relevancy_score** scores) {
+void output_results (struct hashtable* ht, struct relevancy_score** scores) {
     // Open the file with the highest relevancy score
     FILE* f = fopen (scores[0]->doc_id, "r");
 
@@ -190,11 +213,8 @@ void output_results (struct relevancy_score** scores) {
     // Create search_scores.txt
     f = fopen ("search_scores.txt", "w");
 
-    // Get length of scores
-    int len = (int) (sizeof (scores) / sizeof (scores[0]));
-
     // Print each file and its score
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < ht->num_docs; i++) {
         fprintf (f, "%s:%f\n", scores[i]->doc_id, scores[i]->score);
     }
 
@@ -203,10 +223,11 @@ void output_results (struct relevancy_score** scores) {
 
 /**
  * Ranks the documents in order of their tf-idf scores and outputs results.
- * @param  ht           pointer to the hashtable
- * @param search_query  string array of search terms
+ * @param  ht            pointer to the hashtable
+ * @param  search_query  string array of search terms
+ * @param  query_len     length of the search query
  */
-void rank (struct hashtable* ht, char** search_query) {
+void rank (struct hashtable* ht, char** search_query, int query_len) {
     // Array of relevancy_score structs
     struct relevancy_score** scores
         = (struct relevancy_score**) malloc (ht->num_docs * sizeof (struct relevancy_score*));
@@ -215,10 +236,10 @@ void rank (struct hashtable* ht, char** search_query) {
     for (int i = 0; i < ht->num_docs; i++) {
         scores[i] = (struct relevancy_score*) malloc (sizeof (struct relevancy_score));
         scores[i]->doc_id = ht->docIDs[i];
-        scores[i]->score = compute_tf_idf (ht, search_query, ht->docIDs[i]);
+        scores[i]->score = compute_tf_idf (ht, search_query, query_len, ht->docIDs[i]);
     }
     // Sort the doc_ids according to their tf-idf scores
-    sort (scores);
+    sort (ht, scores);
 
-    output_results (scores);
+    output_results (ht, scores);
 }

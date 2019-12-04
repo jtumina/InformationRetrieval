@@ -19,8 +19,9 @@ int comparator (const void *a, const void *b);
 
 /**
  * Function to sort an array of relevancy_score structs.
+ * @param ht      pointer to the hashtable
  * @param scores array to sort
  */
-void sort (struct relevancy_score** scores);
+void sort (struct hashtable* ht, struct relevancy_score** scores);
 
 #endif

@@ -46,32 +46,36 @@ int train (struct hashtable* ht);
 
 /**
  * Reads in search query from user at console.
- * @param str the string that needs to be split into separate words
+ * @param str        the string that needs to be split into separate words
+ * @paran query_len  parameter will hold the length of the search_query
  * @return array of strings where each string is each search term
  */
-char** read_query (char* str);
+char** read_query (char* str, int* query_len);
 
 /**
  * Computes the tf-idf score for this document and givens set of search terms
  * @param  ht           pointer to the hashtable we are working with
  * @param  search_query string array of search terms
+ * @param  query_len    length of the search query
  * @param  doc_id       char* to the doc_id we are computing tf-idf for
  * @return              the relevancy score of this doc_id against the given search_query
  */
-double compute_tf_idf (struct hashtable* ht, char** search_query, char* doc_id);
+double compute_tf_idf (struct hashtable* ht, char** search_query, int query_len, char* doc_id);
 
 /**
- * Print the contents of the most relvant document to console and list all files and their scores
- * in order in search_scores.txt
+ * Print the contents of the most relvant document to console and list all files and
+ * their scores in order in search_scores.txt
+ * @param  ht           pointer to the hashtable we are working with
  * @param scores array of relevancy_scores
  */
-void output_results (struct relevancy_score** scores);
+void output_results (struct hashtable* ht, struct relevancy_score** scores);
 
 /**
- * Computes tf-idf score for each document.
- * @param  ht           pointer to the hashtable
- * @param search_query  string array of search terms
+ * Ranks the documents in order of their tf-idf scores and outputs results.
+ * @param  ht            pointer to the hashtable
+ * @param  search_query  string array of search terms
+ * @param  query_len     length of the search query
  */
-void rank (struct hashtable* ht, char** search_query);
+void rank (struct hashtable* ht, char** search_query, int query_len);
 
 #endif

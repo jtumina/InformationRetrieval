@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "hashtable.h"
 #include "infoRetrieval.h"
+#include "sort.h"
 
 /**
  * Function to compare to relevancy_score structs according to their scores.
@@ -26,11 +28,9 @@ int comparator (const void *a, const void *b)
 
 /**
  * Function to sort an array of relevancy_score structs.
+ * @param ht      pointer to the hashtable
  * @param scores array to sort
  */
-void sort (struct relevancy_score** scores) {
-    // Get length of scores
-    int scores_len = (int) (sizeof (scores) / sizeof (scores[0]));
-
-    qsort ((void*) scores, scores_len, sizeof (scores[0]), comparator);
+void sort (struct hashtable* ht, struct relevancy_score** scores) {
+    qsort ((void*) scores, ht->num_docs, sizeof (struct relevancy_score*), comparator);
 }
