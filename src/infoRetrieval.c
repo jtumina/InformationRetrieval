@@ -10,6 +10,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <errno.h>
+
 #include "hashtable.h"
 #include "infoRetrieval.h"
 #include "sort.h"
@@ -113,14 +115,17 @@ int train (struct hashtable* ht) {
         // Check for NULL files
         if (f == NULL) {
             printf("Error: %s is NULL.\n", ht->docIDs[i]);
-            return 0;
+            printf("%s\n", strerror(errno));
+            exit(0);
         }
 
         // Loop through file, adding each word to the hashtable
         // Assume no word exceeds 20 characters
-        while (fscanf (f, "%20s", buf) == 1) {
+        while (fgets (buf, 20, f) != NULL) {
             ht_insert (ht, buf, ht->docIDs[i]);
         }
+
+        fclose (f);
     }
     return 1;
 }
