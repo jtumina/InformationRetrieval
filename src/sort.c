@@ -21,8 +21,10 @@
  */
 int comparator (const void* a, const void* b)
 {
-    int s1 = (int) ((struct relevancy_score*) a)->score;
-    int s2 = (int) ((struct relevancy_score*) b)->score;
+    // Since comparator() requires an int to be returned, need to multiply scores by 1 million
+    // to get an int that we can compare
+    int s1 = (int) ( ((struct relevancy_score*) a)->score * 1000000 );
+    int s2 = (int) ( ((struct relevancy_score*) b)->score * 1000000 );
     return (s2 - s1);
 }
 

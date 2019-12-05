@@ -33,7 +33,7 @@ double get_idf (struct hashtable* ht, struct wordNode* wordPtr) {
         df++;
     }
 
-    return log (N / df);
+    return log10 (N / df);
 }
 
 /**
@@ -140,6 +140,8 @@ void train (struct hashtable* ht) {
         }
         fclose (f);
     }
+    // Call stop_words()
+    stop_words (ht);
 }
 
 /**
@@ -149,7 +151,12 @@ void train (struct hashtable* ht) {
  * @return array of strings where each string is each search term
  */
 char** read_query (char* str, int* query_len) {
-    char** search_query = (char**) malloc (sizeof (char*));
+    if (str == NULL) {
+        printf("Error: search query cannot be empty.\n");
+        exit (0);
+    }
+
+    char** search_query = (char**) malloc (2 * sizeof (char*));
 
     if (search_query == NULL) {
         printf("Memory Error: Not enough space for search_query.\n");
@@ -162,7 +169,7 @@ char** read_query (char* str, int* query_len) {
     // Loop through str and extract each word
     // Assume no word exceeds 20 characters
     while ((search_query[i] = strtok (NULL, " ")) != NULL) {
-        search_query = (char**) realloc (search_query, (i+1) * sizeof (char*));
+        search_query = (char**) realloc (search_query, (i+2) * sizeof (char*));
 
         if (search_query == NULL) {
             printf("Memory Error: Not enough space for search_query.\n");

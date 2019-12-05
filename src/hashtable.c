@@ -122,6 +122,9 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
             docPtr = (struct docNode*) malloc (sizeof (struct docNode));
             init_docNode (docPtr, doc_id);
 
+			// Increment the df
+			wordPtr->df++;
+
             // Stitch the last docNode to this one
             lastDocPtr->next = docPtr;
 
