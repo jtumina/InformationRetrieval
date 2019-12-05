@@ -156,9 +156,6 @@ void destroy_docList (struct docNode* docPtr) {
 
     // Loop through the docNodes
     while (docPtr != NULL) {
-        // Free the char* to doc_id
-        free (docPtr->doc_id);
-
         // Free current node while maintaining access to the rest of list
         temp = docPtr;
         docPtr = docPtr->next;
@@ -179,9 +176,6 @@ void destroy_wordList (struct wordNode* wordPtr) {
         // Free list of docs at each word
         destroy_docList (wordPtr->docHead);
 
-        // Free the char* to word
-        free (wordPtr->word);
-
         // Free current node while maintaining access to the rest of list
         temp = wordPtr;
         wordPtr = wordPtr->next;
@@ -200,9 +194,6 @@ void ht_destroy (struct hashtable* ht) {
 	}
 
     // Free list of docs
-    for (int i = 0; i < ht->num_docs; i++) {
-        free (ht->docIDs[i]);
-    }
     free (ht->docIDs);
 
     // Finally, free hashtable struct

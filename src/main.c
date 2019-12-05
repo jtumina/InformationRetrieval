@@ -15,7 +15,6 @@ int main (int argc, char** argv) {
     docs[0] = "./p5docs/D1.txt";
     docs[1] = "./p5docs/D2.txt";
     docs[2] = "./p5docs/D3.txt";
-    //docs[3] = "./p5docs/D4.txt";
 
     struct hashtable* ht = ht_create (atoi (argv[1]));
 
@@ -24,8 +23,14 @@ int main (int argc, char** argv) {
 
     int* query_len = (int*) malloc (sizeof (int));
 
+	// Split the str provided into an array of strings
     char** search_query = read_query (argv[2], query_len);
 
+	// Train the hashtable, then rank the files based on the query
     train (ht);
     rank (ht, search_query, *query_len);
+
+	// Deallocate memory
+	ht_destroy (ht);
+	free (search_query);
 }

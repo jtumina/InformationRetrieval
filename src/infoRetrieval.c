@@ -140,7 +140,7 @@ void train (struct hashtable* ht) {
         }
         fclose (f);
     }
-    // Call stop_words()
+    // Remove stop words from hashtable as last step of training process
     stop_words (ht);
 }
 
