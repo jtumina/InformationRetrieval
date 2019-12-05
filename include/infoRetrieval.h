@@ -67,7 +67,7 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, int query_len,
  * @param  ht           pointer to the hashtable we are working with
  * @param scores array of relevancy_scores
  */
-void output_results (struct hashtable* ht, struct relevancy_score** scores);
+void output_results (struct hashtable* ht, struct relevancy_score* scores);
 
 /**
  * Ranks the documents in order of their tf-idf scores and outputs results.

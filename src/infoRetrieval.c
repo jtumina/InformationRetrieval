@@ -208,13 +208,13 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, int query_len,
  * @param  ht           pointer to the hashtable we are working with
  * @param scores array of relevancy_scores
  */
-void output_results (struct hashtable* ht, struct relevancy_score** scores) {
+void output_results (struct hashtable* ht, struct relevancy_score* scores) {
     // Open the file with the highest relevancy score
-    FILE* f = fopen (scores[0]->doc_id, "r");
+    FILE* f = fopen (scores[0].doc_id, "r");
 
     // Check for NULL to prevent crash
     if (f == NULL) {
-        printf("Error: %s is NULL.\n", scores[0]->doc_id);
+        printf("Error: %s is NULL.\n", scores[0].doc_id);
         return;
     }
 
@@ -231,7 +231,7 @@ void output_results (struct hashtable* ht, struct relevancy_score** scores) {
 
     // Print each file and its score
     for (int i = 0; i < ht->num_docs; i++) {
-        fprintf (f, "%s:%f\n", scores[i]->doc_id, scores[i]->score);
+        fprintf (f, "%s:%f\n", scores[i].doc_id, scores[i].score);
     }
 
     fclose (f);
@@ -245,17 +245,14 @@ void output_results (struct hashtable* ht, struct relevancy_score** scores) {
  */
 void rank (struct hashtable* ht, char** search_query, int query_len) {
     // Array of relevancy_score structs
-    struct relevancy_score** scores = (struct relevancy_score**) malloc ((ht->num_docs) * sizeof (struct relevancy_score*));
+    struct relevancy_score scores[ht->num_docs];
 
     // Loop through documents and compute tf-idf for each one,
     for (int i = 0; i < ht->num_docs; i++) {
-        scores[i] = (struct relevancy_score*) malloc (sizeof (struct relevancy_score));
-        scores[i]->doc_id = ht->docIDs[i];
-        scores[i]->score = compute_tf_idf (ht, search_query, query_len, ht->docIDs[i]);
+        //scores[i] = (struct relevancy_score) malloc (sizeof (struct relevancy_score));
+        scores[i].doc_id = ht->docIDs[i];
+        scores[i].score = compute_tf_idf (ht, search_query, query_len, ht->docIDs[i]);
     }
-    scores[0]->score = 2;
-    scores[1]->score = 2;
-    scores[2]->score = 1;
 
     // Sort the doc_ids according to their tf-idf scores
     sort (ht, scores);
