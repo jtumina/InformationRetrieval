@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
 #include <errno.h>
 
 #include "hashtable.h"
@@ -101,12 +100,10 @@ void stop_words (struct hashtable* ht) {
 /**
  * Takes a set of documents and populates the hashtable.
  * @param  ht    pointer to the hashtable
- * @return 1 if succesful and 0 if not
  */
-int train (struct hashtable* ht) {
+void train (struct hashtable* ht) {
     // Pointer to file
     FILE* f;
-    char buf[21];
 
     // Loop through the set of documents
     for (int i = 0; i < ht->num_docs; i++) {
@@ -114,20 +111,34 @@ int train (struct hashtable* ht) {
 
         // Check for NULL files
         if (f == NULL) {
-            printf("Error: %s is NULL.\n", ht->docIDs[i]);
+            printf("Error in opening %s: ", ht->docIDs[i]);
             printf("%s\n", strerror(errno));
             exit(0);
         }
 
-        // Loop through file, adding each word to the hashtable
-        // Assume no word exceeds 20 characters
-        while (fgets (buf, 20, f) != NULL) {
-            ht_insert (ht, buf, ht->docIDs[i]);
-        }
+        char c;
+        char word[21];
+        int j = 0;
 
+        // Read each char from doc until EOF
+        while ((c = getc (f)) != EOF) {
+            // If char is a space or \n, this is the end of a word
+            if (c == ' ' || c == '\n') {
+                // Set the last char of the word as the string terminator
+                word[j] = '\0';
+                ht_insert (ht, word, ht->docIDs[i]);
+                j = 0;
+            } else {
+                word[j] = c;
+                j++;
+            }
+        }
+        // If j did not get reset to 0, then add this word to hashtable
+        if (j != 0) {
+            ht_insert (ht, word, ht->docIDs[i]);
+        }
         fclose (f);
     }
-    return 1;
 }
 
 /**
@@ -182,7 +193,8 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, int query_len,
 
         // Get the tf and idf for this word, doc_id pair
         int tf = get_tf (wordPtr, doc_id);
-        int idf = get_idf (ht, wordPtr);
+        printf("TF of %s: %d\n", search_query[j], tf);
+        double idf = get_idf (ht, wordPtr);
 
         // Compute tf*idf and add it to the score for this doc
         r += (tf * idf);
@@ -209,7 +221,7 @@ void output_results (struct hashtable* ht, struct relevancy_score** scores) {
     // Print the cotents of the file, char by char
     char c;
     while ((c = getc (f)) != EOF) {
-        printf("%c\n", c);
+        printf("%c", c);
     }
 
     fclose (f);
@@ -233,8 +245,7 @@ void output_results (struct hashtable* ht, struct relevancy_score** scores) {
  */
 void rank (struct hashtable* ht, char** search_query, int query_len) {
     // Array of relevancy_score structs
-    struct relevancy_score** scores
-        = (struct relevancy_score**) malloc (ht->num_docs * sizeof (struct relevancy_score*));
+    struct relevancy_score** scores = (struct relevancy_score**) malloc ((ht->num_docs) * sizeof (struct relevancy_score*));
 
     // Loop through documents and compute tf-idf for each one,
     for (int i = 0; i < ht->num_docs; i++) {

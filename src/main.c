@@ -12,14 +12,15 @@ int main (int argc, char** argv) {
     }
 
     char** docs = (char**) malloc (3 * sizeof (char*));
-    docs[0] = "./p5docs/D1.txt";
-    docs[1] = "./p5docs/D2.txt";
-    docs[2] = "./p5docs/D3.txt";
+    //docs[0] = "./p5docs/D1.txt";
+    //docs[1] = "./p5docs/D2.txt";
+    //docs[2] = "./p5docs/D3.txt";
+    docs[0] = "./p5docs/D4.txt";
 
     struct hashtable* ht = ht_create (atoi (argv[1]));
 
     ht->docIDs = docs;
-    ht->num_docs = 3;
+    ht->num_docs = 1;
 
     int* query_len = (int*) malloc (sizeof (int));
 

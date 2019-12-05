@@ -40,9 +40,8 @@ void stop_words (struct hashtable* ht);
 /**
  * Takes a set of documents and populates the hashtable.
  * @param  ht    pointer to the hashtable
- * @return 1 if succesful and 0 if not
  */
-int train (struct hashtable* ht);
+void train (struct hashtable* ht);
 
 /**
  * Reads in search query from user at console.
