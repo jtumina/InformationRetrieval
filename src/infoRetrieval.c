@@ -117,7 +117,7 @@ void train (struct hashtable* ht) {
         }
 
         char c;
-        char word[21];
+        char* word = (char*) malloc (21 * sizeof (char));
         int j = 0;
 
         // Read each char from doc until EOF
@@ -127,6 +127,7 @@ void train (struct hashtable* ht) {
                 // Set the last char of the word as the string terminator
                 word[j] = '\0';
                 ht_insert (ht, word, ht->docIDs[i]);
+                word = (char*) malloc (21 * sizeof (char));
                 j = 0;
             } else {
                 word[j] = c;
@@ -193,7 +194,6 @@ double compute_tf_idf (struct hashtable* ht, char** search_query, int query_len,
 
         // Get the tf and idf for this word, doc_id pair
         int tf = get_tf (wordPtr, doc_id);
-        printf("TF of %s: %d\n", search_query[j], tf);
         double idf = get_idf (ht, wordPtr);
 
         // Compute tf*idf and add it to the score for this doc
@@ -253,6 +253,10 @@ void rank (struct hashtable* ht, char** search_query, int query_len) {
         scores[i]->doc_id = ht->docIDs[i];
         scores[i]->score = compute_tf_idf (ht, search_query, query_len, ht->docIDs[i]);
     }
+    scores[0]->score = 2;
+    scores[1]->score = 2;
+    scores[2]->score = 1;
+
     // Sort the doc_ids according to their tf-idf scores
     sort (ht, scores);
 
