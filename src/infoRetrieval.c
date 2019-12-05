@@ -162,7 +162,7 @@ char** read_query (char* str, int* query_len) {
     // Loop through str and extract each word
     // Assume no word exceeds 20 characters
     while ((search_query[i] = strtok (NULL, " ")) != NULL) {
-        search_query = (char**) realloc (search_query, sizeof (char*));
+        search_query = (char**) realloc (search_query, (i+1) * sizeof (char*));
 
         if (search_query == NULL) {
             printf("Memory Error: Not enough space for search_query.\n");
