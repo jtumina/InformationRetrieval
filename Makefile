@@ -11,10 +11,10 @@ OBJ_DIR = ./obj
 
 # file lists
 CFILES = $(wildcard $(SRC_DIR)/*.c)
-OBJS = ./obj/hashtable.o ./obj/infoRetrieval.o ./obj/sort.o ./obj/main.o
+OBJS = ./obj/hashtable.o ./obj/infoRetrieval.o ./obj/sort.o ./obj/search.o
 
 # binary
-BIN = main
+BIN = search
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -o $@ -c $<
