@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glob.h>
 
 #include "hashtable.h"
 #include "infoRetrieval.h"
@@ -11,15 +12,17 @@ int main (int argc, char** argv) {
         exit (0);
     }
 
-    char** docs = (char**) malloc (3 * sizeof (char*));
-    docs[0] = "./p5docs/D1.txt";
-    docs[1] = "./p5docs/D2.txt";
-    docs[2] = "./p5docs/D3.txt";
+    glob_t result;
+
+    if (glob("./p5docs/*.txt", 0, 0, &result) != 0) {
+        printf("Error: Problem with glob\n");
+        exit (0);
+    }
 
     struct hashtable* ht = ht_create (atoi (argv[1]));
 
-    ht->docIDs = docs;
-    ht->num_docs = 3;
+    ht->docIDs = result.gl_pathv;
+    ht->num_docs = result.gl_pathc;
 
     int* query_len = (int*) malloc (sizeof (int));
 
@@ -33,4 +36,5 @@ int main (int argc, char** argv) {
 	// Deallocate memory
 	ht_destroy (ht);
 	free (search_query);
+    globfree (&result);
 }
