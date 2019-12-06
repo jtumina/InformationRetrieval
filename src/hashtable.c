@@ -21,11 +21,18 @@ struct hashtable* ht_create (int num_buckets) {
     // Check for allocation errors
     if (ht == NULL) {
         printf("Error: unable to allocate memory for hashtable\n");
-        return NULL;
+        exit (0);
     }
 
     // Initialize fields of hashtable
     ht->map = (struct wordNode**) malloc (num_buckets * sizeof (struct wordNode*));
+
+	// Check for allocation errors
+    if (ht->map == NULL) {
+        printf("Error: unable to allocate memory for ht->map\n");
+        exit (0);
+    }
+
 	ht->num_buckets = num_buckets;
 	ht->num_elements = 0;
     ht->docIDs = NULL;
@@ -34,6 +41,12 @@ struct hashtable* ht_create (int num_buckets) {
     // Initialize space for a wordNode pointer in each bucket
 	for (int i = 0; i < num_buckets; i++) {
 		ht->map[i] = (struct wordNode*) malloc (sizeof (struct wordNode));
+
+		// Check for allocation errors
+	    if (ht->map[i] == NULL) {
+	        printf("Error: unable to allocate memory for ht->map[%d]\n", i);
+	        exit (0);
+	    }
 
 		// Initialize variables in wordNode to NULL/0
 		ht->map[i]->word = NULL;
@@ -67,6 +80,13 @@ void init_wordNode (struct wordNode* wordPtr, char* word, char* doc_id) {
     wordPtr->word = word;
     wordPtr->df = 1;
     wordPtr->docHead = (struct docNode*) malloc (sizeof (struct docNode));
+
+	// Check for allocation errors
+    if (wordPtr->docHead == NULL) {
+        printf("Error: unable to allocate memory for wordPtr->docHead\n");
+        exit (0);
+    }
+
     wordPtr->next = NULL;
 
     // Initialize fields of docNode
@@ -120,6 +140,13 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
             }
             // Else, this word is in a new doc
             docPtr = (struct docNode*) malloc (sizeof (struct docNode));
+
+			// Check for allocation errors
+		    if (docPtr == NULL) {
+		        printf("Error: unable to allocate memory for docPtr\n");
+		        exit (0);
+		    }
+
             init_docNode (docPtr, doc_id);
 
 			// Increment the df
@@ -137,6 +164,13 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
 
     // If wordPtr==NULL, word is not in hashtable, call init_wordNode
     wordPtr = (struct wordNode*) malloc (sizeof (struct wordNode));
+
+	// Check for allocation errors
+    if (wordPtr == NULL) {
+        printf("Error: unable to allocate memory for wordPtr\n");
+        exit (0);
+    }
+
     init_wordNode (wordPtr, word, doc_id);
 
 	// Set node before this one's next to this node

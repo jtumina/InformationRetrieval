@@ -118,6 +118,13 @@ void train (struct hashtable* ht) {
 
         char c;
         char* word = (char*) malloc (21 * sizeof (char));
+
+        // Check for allocation errors
+        if (word == NULL) {
+            printf("Error: unable to allocate memory for word\n");
+            exit (0);
+        }
+
         int j = 0;
 
         // Read each char from doc until EOF
@@ -128,6 +135,13 @@ void train (struct hashtable* ht) {
                 word[j] = '\0';
                 ht_insert (ht, word, ht->docIDs[i]);
                 word = (char*) malloc (21 * sizeof (char));
+
+                // Check for allocation errors
+                if (word == NULL) {
+                    printf("Error: unable to allocate memory for word\n");
+                    exit (0);
+                }
+
                 j = 0;
             } else {
                 word[j] = c;

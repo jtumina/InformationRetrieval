@@ -26,6 +26,12 @@ int main (int argc, char** argv) {
 
     int* query_len = (int*) malloc (sizeof (int));
 
+    // Check for allocation errors
+    if (query_len == NULL) {
+        printf("Error: unable to allocate memory for query_len\n");
+        exit (0);
+    }
+
 	// Split the str provided into an array of strings
     char** search_query = read_query (argv[2], query_len);
 
@@ -36,5 +42,4 @@ int main (int argc, char** argv) {
 	// Deallocate memory
 	ht_destroy (ht);
 	free (search_query);
-    globfree (&result);
 }
