@@ -8,7 +8,9 @@
 
 int main (int argc, char** argv) {
 
+	// Check that the number of arguments are correct
     if (argc != 3) {
+		printf ("Error: Incorrect format of arguments\n");
         exit (0);
     }
 
@@ -19,7 +21,13 @@ int main (int argc, char** argv) {
         exit (0);
     }
 
-    struct hashtable* ht = ht_create (atoi (argv[1]));
+	int num_buckets;
+	// If argv[1] is not a number, atoi() will return 0
+	if ( (num_buckets = atoi (argv[1])) == 0 ) {
+		printf ("Error: number of buckets cannot be 0\n");
+		exit (0);
+	}
+    struct hashtable* ht = ht_create (num_buckets);
 
     ht->docIDs = result.gl_pathv;
     ht->num_docs = result.gl_pathc;
