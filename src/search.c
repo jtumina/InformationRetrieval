@@ -14,6 +14,14 @@ int main (int argc, char** argv) {
         exit (0);
     }
 
+    // Check if second argument is valid number for buckets
+    int num_buckets;
+	// If argv[1] is not a number, atoi() will return 0
+	if ( (num_buckets = atoi (argv[1])) == 0 ) {
+		printf ("Error: number of buckets cannot be 0\n");
+		exit (0);
+	}
+
     glob_t result;
 
     if (glob("./p5docs/*.txt", 0, 0, &result) != 0) {
@@ -21,12 +29,7 @@ int main (int argc, char** argv) {
         exit (0);
     }
 
-	int num_buckets;
-	// If argv[1] is not a number, atoi() will return 0
-	if ( (num_buckets = atoi (argv[1])) == 0 ) {
-		printf ("Error: number of buckets cannot be 0\n");
-		exit (0);
-	}
+    // Create the data structure
     struct hashtable* ht = ht_create (num_buckets);
 
     ht->docIDs = result.gl_pathv;
@@ -51,5 +54,5 @@ int main (int argc, char** argv) {
 	ht_destroy (ht);
 	free (search_query);
 	free (query_len);
-	globfree (&result);	
+	globfree (&result);
 }
