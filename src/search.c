@@ -22,6 +22,13 @@ int main (int argc, char** argv) {
 		exit (0);
 	}
 
+	// Check if third argument is a valid search query
+	if (strcmp (argv[2], "") == 0) {
+		printf ("Error: search query cannot be empty\n");
+		exit (0);
+	}
+
+	// Glob for text files
     glob_t result;
 
     if (glob("./p5docs/*.txt", 0, 0, &result) != 0) {
