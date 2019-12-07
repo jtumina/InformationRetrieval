@@ -77,7 +77,7 @@ void stop_words (struct hashtable* ht) {
         // Get head of word list at this bucket
         struct wordNode* wordPtr = ht->map[i];
         // Temp pointer to point to node before wordPtr to stitch list together
-        struct wordNode* lastPtr = ht->map[i];
+        struct wordNode* lastPtr = NULL;
 
         // Loop through word list
         while (wordPtr != NULL) {
@@ -90,24 +90,26 @@ void stop_words (struct hashtable* ht) {
                 destroy_docList (wordPtr->docHead);
 
 				// If this is the first word in the bucket
-				if (wordPtr == lastPtr) {
+				if (lastPtr == NULL) {
 					ht->map[i] = wordPtr->next;	
 					
 					// If this is the ONLY word in this bucket
 					if (wordPtr->next == NULL) {
 						init_empty_wordNode (&ht->map[i]);
 					}
+
+					free (wordPtr);
+					wordPtr = ht->map[i]->next;
 				} else { // Stich the node before this to the one after this
 					lastPtr->next = wordPtr->next;
+					free (wordPtr);
+					wordPtr = lastPtr->next;
 				}
-				
-                free (wordPtr);
 
-				wordPtr = lastPtr->next;
-            } //else {
+            } else {
 				lastPtr = wordPtr;
 				wordPtr = wordPtr->next;
-			//}
+			}
         }
     }
 }
