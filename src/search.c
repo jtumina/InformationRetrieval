@@ -36,6 +36,12 @@ int main (int argc, char** argv) {
         exit (0);
     }
 
+	// Check if glob finds more than 1 file
+	if (result.gl_pathc == 1) {
+		printf ("Error: glob only found 1 matching file\n");
+		exit (0);
+	}
+
     // Create the data structure
     struct hashtable* ht = ht_create (num_buckets);
 

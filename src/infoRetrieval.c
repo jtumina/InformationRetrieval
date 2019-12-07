@@ -10,6 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "hashtable.h"
 #include "infoRetrieval.h"
@@ -144,7 +145,8 @@ void train (struct hashtable* ht) {
 
                 j = 0;
             } else {
-                word[j] = c;
+				// Make the character lowercase for case-insensitivity
+                word[j] = tolower (c);
                 j++;
             }
         }
@@ -156,6 +158,19 @@ void train (struct hashtable* ht) {
     }
     // Remove stop words from hashtable as last step of training process
     stop_words (ht);
+}
+
+/**
+ * Turns a string to all lowercase characters
+ * @param str  the string to be converted to lowercase
+ */
+void str_tolower (char* str) {
+	// Loop through str and make each char lowercase
+	int i = 0;
+	while (str[i] != '\0') {
+		str[i] = tolower(str[i]);
+		i++;
+	}
 }
 
 /**
@@ -178,11 +193,16 @@ char** read_query (char* str, int* query_len) {
     }
 
     search_query[0] = strtok (str, " ");
-    int i = 1;
+	str_tolower (search_query[0]);
 
     // Loop through str and extract each word
-    // Assume no word exceeds 20 characters
+    int i = 1;
     while ((search_query[i] = strtok (NULL, " ")) != NULL) {
+
+		// Make the search term lowercase
+		str_tolower (search_query[i]);
+
+		// Realloc space for another term
         search_query = (char**) realloc (search_query, (i+2) * sizeof (char*));
 
         if (search_query == NULL) {

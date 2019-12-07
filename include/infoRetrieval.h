@@ -44,6 +44,12 @@ void stop_words (struct hashtable* ht);
 void train (struct hashtable* ht);
 
 /**
+ * Turns a string to all lowercase characters
+ * @param str  the string to be converted to lowercase
+ */
+void str_tolower (char* str);
+
+/**
  * Reads in search query from user at console.
  * @param str        the string that needs to be split into separate words
  * @paran query_len  parameter will hold the length of the search_query
