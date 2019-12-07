@@ -43,6 +43,12 @@ struct hashtable* ht_create (int num_buckets);
 void init_docNode (struct docNode* docPtr, char* doc_id);
 
 /**
+ * Initialize a new wordNode with empty fields
+ * @param wordPtr  pointer to the wordNode to initialize
+ */
+void init_empty_wordNode (struct wordNode** wordPtr);
+
+/**
  * Initialize a new word node with the given parameters.
  * @param wordPtr pointer to the wordNode to edit
  * @param word    char* to word we need to add

@@ -81,19 +81,33 @@ void stop_words (struct hashtable* ht) {
 
         // Loop through word list
         while (wordPtr != NULL) {
+
             // If the idf of this word == 0, it is a stop word and we need to remove it
             if (get_idf (ht, wordPtr) == 0) {
+
                 // Free the fields of this wordPtr
                 free (wordPtr->word);
                 destroy_docList (wordPtr->docHead);
 
-                // Stich the node before this to the one after this
-                lastPtr->next = wordPtr->next;
-
+				// If this is the first word in the bucket
+				if (wordPtr == lastPtr) {
+					ht->map[i] = wordPtr->next;	
+					
+					// If this is the ONLY word in this bucket
+					if (wordPtr->next == NULL) {
+						init_empty_wordNode (&ht->map[i]);
+					}
+				} else { // Stich the node before this to the one after this
+					lastPtr->next = wordPtr->next;
+				}
+				
                 free (wordPtr);
-            }
-            lastPtr = wordPtr;
-            wordPtr = wordPtr->next;
+
+				wordPtr = lastPtr->next;
+            } //else {
+				lastPtr = wordPtr;
+				wordPtr = wordPtr->next;
+			//}
         }
     }
 }

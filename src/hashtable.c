@@ -40,19 +40,7 @@ struct hashtable* ht_create (int num_buckets) {
 
     // Initialize space for a wordNode pointer in each bucket
 	for (int i = 0; i < num_buckets; i++) {
-		ht->map[i] = (struct wordNode*) malloc (sizeof (struct wordNode));
-
-		// Check for allocation errors
-	    if (ht->map[i] == NULL) {
-	        printf("Error: unable to allocate memory for ht->map[%d]\n", i);
-	        exit (0);
-	    }
-
-		// Initialize variables in wordNode to NULL/0
-		ht->map[i]->word = NULL;
-		ht->map[i]->df = 0;
-        ht->map[i]->docHead = NULL;
-		ht->map[i]->next = NULL;
+		init_empty_wordNode (&ht->map[i]); 	
 	}
 
     return ht;
@@ -67,6 +55,26 @@ void init_docNode (struct docNode* docPtr, char* doc_id) {
     docPtr->doc_id = doc_id;
     docPtr->tf = 1;
     docPtr->next = NULL;
+}
+
+/**
+ * Initialize a new wordNode with empty fields
+ * @param wordPtr  pointer to the wordNode to initialize
+ */
+void init_empty_wordNode (struct wordNode** wordPtr) {
+	*wordPtr = (struct wordNode*) malloc (sizeof (struct wordNode));
+
+	// Check for allocation errors
+	if (wordPtr == NULL) {
+		printf("Error: unable to allocate memory for wordPtr\n");
+		exit (0);
+	}
+
+	// Initialize variables in wordNode to NULL/0
+	(*wordPtr)->word = NULL;
+	(*wordPtr)->df = 0;
+	(*wordPtr)->docHead = NULL;
+	(*wordPtr)->next = NULL;
 }
 
 /**
