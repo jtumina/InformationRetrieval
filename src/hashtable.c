@@ -229,10 +229,6 @@ void ht_destroy (struct hashtable* ht) {
 	for (int i = 0; i < ht->num_buckets; i++) {
         destroy_wordList (ht->map[i]);
 	}
-
-    // Free list of docs
-    free (ht->docIDs);
-
     // Finally, free hashtable struct
 	free (ht);
 }
