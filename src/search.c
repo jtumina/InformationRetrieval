@@ -50,4 +50,6 @@ int main (int argc, char** argv) {
 	// Deallocate memory
 	ht_destroy (ht);
 	free (search_query);
+	free (query_len);
+	free (result.gl_pathv);
 }

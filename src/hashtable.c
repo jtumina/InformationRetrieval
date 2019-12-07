@@ -210,6 +210,9 @@ void destroy_wordList (struct wordNode* wordPtr) {
         // Free list of docs at each word
         destroy_docList (wordPtr->docHead);
 
+		// Free the word
+		free (wordPtr->word);
+
         // Free current node while maintaining access to the rest of list
         temp = wordPtr;
         wordPtr = wordPtr->next;
