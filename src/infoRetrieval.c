@@ -169,7 +169,9 @@ void train (struct hashtable* ht) {
         // If j did not get reset to 0, then add this word to hashtable
         if (j != 0) {
             ht_insert (ht, word, ht->docIDs[i]);
-        }
+        } else { // We need to free this word since it is not in the hashtable
+			free (word);
+		}
         fclose (f);
     }
     // Remove stop words from hashtable as last step of training process

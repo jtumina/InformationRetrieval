@@ -134,6 +134,10 @@ void ht_insert (struct hashtable* ht, char* word, char* doc_id) {
 	while (wordPtr != NULL) {
 		// If we've found the word already in hashtable, we only need to update its fields
 		if (strcmp (wordPtr->word, word) == 0) {
+
+			// Since the word already exists, we can free the copy of it
+			free (word);
+
             // Continue through docNodes until we find the right doc
             struct docNode* docPtr = wordPtr->docHead;
             struct docNode* lastDocPtr = NULL;
@@ -218,6 +222,9 @@ void destroy_wordList (struct wordNode* wordPtr) {
         // Free list of docs at each word
         destroy_docList (wordPtr->docHead);
 
+		// Members of this wordNode
+		free (wordPtr->word);
+
         // Free current node while maintaining access to the rest of list
         temp = wordPtr;
         wordPtr = wordPtr->next;
@@ -234,7 +241,7 @@ void ht_destroy (struct hashtable* ht) {
 	for (int i = 0; i < ht->num_buckets; i++) {
         destroy_wordList (ht->map[i]);
 	}
-    // Finally, free hashtable struct
+	free (ht->map);	
 	free (ht);
 }
 
