@@ -1,6 +1,7 @@
 # InformationRetrieval
 Application searches a directory of text files called `p5docs/` for a given search query and prints the most relevant document to the console
 and outputs the other sorted file names and their associated relevancy scores to a file called `search_scores.txt`.
+Uses TF-IDF algorithm to determine relevancy scores. Also removes stop words (words that appear in every document) to help the score to be as accurate as possible. 
 
 ## Compliling and Running
 Project can be compiled using command `make` followed by running the executable with the following arguments:
